@@ -8,10 +8,15 @@ namespace MeowTruck.UI
 	public class MainUI : MonoBehaviour
 	{
 		[SerializeField] private Button hostButton;
+		[SerializeField] private Button clientButton;
 
 		private async void OnEnable()
 		{
 			hostButton.onClick.AddListener(() => { StartLobby().Forget(); });
+			clientButton.onClick.AddListener(() =>
+			{
+				GameNetworkManager.instance.FindLobbiesWithCallback((lobbies) => GameNetworkManager.instance.JoinLobby(lobbies[0]));
+			});
 		}
 
 		private async UniTaskVoid StartLobby()

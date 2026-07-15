@@ -4,6 +4,7 @@ using Steamworks;
 using Steamworks.Data;
 using Unity.Netcode;
 using UnityEngine;
+using System;
 
 namespace MeowTruck.Manager
 {
@@ -130,8 +131,35 @@ namespace MeowTruck.Manager
 			}
 			lobby.SetPublic();
 			lobby.SetJoinable(true);
+			lobby.SetData("TEST", "DATAqwe");
 			lobby.SetGameServer(lobby.Owner.Id);
 			Debug.Log($"lobby created");
+		}
+
+		public async void FindLobbiesWithCallback(Action<Lobby[]> callback)
+		{
+			var query = SteamMatchmaking.LobbyList
+				.WithKeyValue("TEST", "DATAqwe")
+				.FilterDistanceClose();
+
+			var lobbies = await query.RequestAsync();
+
+			if (lobbies == null) return;
+
+			callback.Invoke(lobbies);
+			return;
+		}
+
+		public async void JoinLobby(Lobby lobby)
+		{
+			try
+			{
+				await lobby.Join();
+			}
+			catch (Exception e)
+			{
+				Debug.LogWarning($"Lobby enter failed : {e.Message}");
+			}
 		}
 
 		public async UniTask StartHost(int maxMembers)
