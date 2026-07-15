@@ -28,7 +28,6 @@ namespace MeowTruck.Controllers
 					yield break;
 				}
 
-				Debug.Log("LOAD NETWORK SCENE");
 				NetworkManager.Singleton.SceneManager.LoadScene(
 					nextScene,
 					LoadSceneMode.Single);

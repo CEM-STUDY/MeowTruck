@@ -8,9 +8,21 @@ namespace MeowTruck.Controllers
 		[Header("Movement Params")]
 		[SerializeField] private float moveSpeed;
 
+		private PlayerController instance = null;
+
 		private void Awake()
 		{
-			DontDestroyOnLoad(gameObject);
+			if (!IsOwner) return;
+
+			if (instance == null)
+			{
+				instance = this;
+				DontDestroyOnLoad(gameObject);
+			}
+			else
+			{
+				Destroy(gameObject);
+			}
 		}
 
 		private void Update()

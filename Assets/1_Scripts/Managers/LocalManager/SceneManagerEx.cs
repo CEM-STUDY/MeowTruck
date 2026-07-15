@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using Unity.Netcode;
+﻿using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace MeowTruck.Manager
@@ -26,7 +26,7 @@ namespace MeowTruck.Manager
 			}
 			else
 			{
-				SceneManager.LoadScene(
+				SceneManager.LoadSceneAsync(
 					Constants.SCENE_TRANSITION,
 					LoadSceneMode.Single);
 			}

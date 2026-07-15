@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1176505444709217779}
   - component: {fileID: 7363916915464266829}
-  - component: {fileID: 3686912063698905671}
   - component: {fileID: 802669652435514478}
+  - component: {fileID: 3686912063698905671}
   - component: {fileID: 3962527570924937054}
   - component: {fileID: 4875120067413540609}
   m_Layer: 10
@@ -95,19 +95,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &3686912063698905671
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6641076352189412669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61cd11806a6d8684ebd11aefc8aaf0a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Controllers.PlayerController
-  moveSpeed: 1
 --- !u!114 &802669652435514478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,6 +120,20 @@ MonoBehaviour:
   AutoObjectParentSync: 0
   SyncOwnerTransformWhenParented: 0
   AllowOwnerToParent: 0
+--- !u!114 &3686912063698905671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641076352189412669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61cd11806a6d8684ebd11aefc8aaf0a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Controllers.PlayerController
+  ShowTopMostFoldoutHeaderGroup: 1
+  moveSpeed: 3
 --- !u!114 &3962527570924937054
 MonoBehaviour:
   m_ObjectHideFlags: 0

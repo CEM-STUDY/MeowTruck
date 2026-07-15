@@ -1,7 +1,7 @@
 using MeowTruck.Manager;
 using UnityEngine;
 
-namespace MeowTruck
+namespace MeowTruck.Misc
 {
 	// Convert scene after others init.
 	[DefaultExecutionOrder(100)]
