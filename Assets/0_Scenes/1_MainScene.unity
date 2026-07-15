@@ -848,6 +848,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.LobbyUI
   hostButton: {fileID: 1175253394}
+  clientButton: {fileID: 212044864}
 --- !u!1 &1175253392
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ using Steamworks.Data;
 using Unity.Netcode;
 using UnityEngine;
 using System;
+using MeowTruck.UI;
 
 namespace MeowTruck.Manager
 {
@@ -37,6 +38,7 @@ namespace MeowTruck.Manager
 		private void Start()
 		{
 			transport = GetComponent<FacepunchTransport>();
+			transport.Initialize();
 
 			SteamMatchmaking.OnLobbyCreated += SteamMatchmaking_OnLobbyCreated;
 			SteamMatchmaking.OnLobbyEntered += SteamMatchmaking_OnLobbyEntered;
@@ -131,16 +133,15 @@ namespace MeowTruck.Manager
 			}
 			lobby.SetPublic();
 			lobby.SetJoinable(true);
-			lobby.SetData("TEST", "DATAqwe");
-			lobby.SetGameServer(lobby.Owner.Id);
 			Debug.Log($"lobby created");
 		}
 
 		public async void FindLobbiesWithCallback(Action<Lobby[]> callback)
 		{
-			var query = SteamMatchmaking.LobbyList
-				.WithKeyValue("TEST", "DATAqwe")
-				.FilterDistanceClose();
+			Debug.Log($"SteamClient.IsValid = {SteamClient.IsValid}");
+			Debug.Log($"SteamId = {SteamClient.SteamId}");
+			var query = SteamMatchmaking.LobbyList;
+//				.WithKeyValue("TEST", "DATAqwe");
 
 			var lobbies = await query.RequestAsync();
 
@@ -168,6 +169,7 @@ namespace MeowTruck.Manager
 			NetworkManager.Singleton.StartHost();
 			GameManagerEx.Instance.MyClientId = NetworkManager.Singleton.LocalClientId;
 			currentLobby = await SteamMatchmaking.CreateLobbyAsync(maxMembers);
+			currentLobby.Value.SetData("TEST", "DATAqwe");
 		}
 
 		public void StartClient(SteamId sId)
