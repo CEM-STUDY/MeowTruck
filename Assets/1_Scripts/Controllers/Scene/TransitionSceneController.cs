@@ -23,11 +23,12 @@ namespace MeowTruck.Controllers
 
 			if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
-				if (!NetworkManager.Singleton.IsServer)
+				if (!NetworkManager.Singleton.IsHost)
 				{
 					yield break;
 				}
 
+				Debug.Log("LOAD NETWORK SCENE");
 				NetworkManager.Singleton.SceneManager.LoadScene(
 					nextScene,
 					LoadSceneMode.Single);

@@ -1,16 +1,25 @@
+using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace MeowTruck.Manager
 {
 	public class GameManagerEx : MonoBehaviour
 	{
-		public bool connected;
-		public bool inGame;
-		public bool isHost;
-		public ulong myClientId;
+		private bool isConnected;
+		private bool inGame;
+		private bool isHost;
+		private ulong myClientId;
+
+		public ulong MyClientId { get => myClientId; set { myClientId = value;} }
+
+		[Header("PlayerSpawn")]
+		[SerializeField] private GameObject playerPrefab;
 
 		private static GameManagerEx instance;
 		public static GameManagerEx Instance => instance;
+		
+		
 		private void Awake()
 		{
 			if (instance == null)
@@ -24,24 +33,33 @@ namespace MeowTruck.Manager
 			}
 		}
 
+		[ContextMenu("PLAYER SPAWN TEST")]
+		public void SpawnPlayerObject()
+		{
+			if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+			{
+				if (NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject() != null) return;
 
-
+				var player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+				player.GetComponent<NetworkObject>().SpawnAsPlayerObject(myClientId);
+			}
+		}
 		public void HostCreated()
 		{
 			isHost = true;
-			connected = true;
+			isConnected = true;
 		}
 
 		public void ConnectedAsClient()
 		{
 			isHost = false;
-			connected = true;
+			isConnected = true;
 		}
 
 		public void Disconnected()
 		{
 			isHost = false;
-			connected = false;
+			isConnected = false;
 		}
 
 		public void Quit()

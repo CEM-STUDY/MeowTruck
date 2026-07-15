@@ -1,3 +1,4 @@
+using MeowTruck.Manager;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -58,7 +59,7 @@ namespace MeowTruck.Environments
 
 		private void Update()
 		{
-			meetingProgress.size = new Vector2(elapsedTime.Value / maxTime, 1f);
+			meetingProgress.size = new Vector2(Mathf.Clamp01(elapsedTime.Value / maxTime), 1f);
 			playerCount = Physics2D.OverlapBox(transform.position.ToVec2() + boxCenter, boxSize * 0.5f, 0f, filter, hits);
 			
 			isLocalPlayerDetected = false;
@@ -81,6 +82,7 @@ namespace MeowTruck.Environments
 				if (elapsedTime.Value > maxTime)
 				{
 					// TODO - 게이지 다 차면 할 일 작성
+					Managers.Scene.ChangeScene(Constants.SCENE_GAME);
 				}
 			}
 			else

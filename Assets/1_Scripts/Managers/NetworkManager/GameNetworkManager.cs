@@ -138,7 +138,7 @@ namespace MeowTruck.Manager
 		{
 			NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
 			NetworkManager.Singleton.StartHost();
-			GameManagerEx.Instance.myClientId = NetworkManager.Singleton.LocalClientId;
+			GameManagerEx.Instance.MyClientId = NetworkManager.Singleton.LocalClientId;
 			currentLobby = await SteamMatchmaking.CreateLobbyAsync(maxMembers);
 		}
 
@@ -147,7 +147,7 @@ namespace MeowTruck.Manager
 			NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
 			NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisconnectCallback;
 			transport.targetSteamId = sId;
-			GameManagerEx.Instance.myClientId = NetworkManager.Singleton.LocalClientId;
+			GameManagerEx.Instance.MyClientId = NetworkManager.Singleton.LocalClientId;
 			if (NetworkManager.Singleton.StartClient())
 			{
 				Debug.Log("Client has started");
@@ -185,7 +185,7 @@ namespace MeowTruck.Manager
 
 		private void Singleton_OnClientConnectedCallback(ulong cliendId)
 		{
-			GameManagerEx.Instance.myClientId = cliendId;
+			GameManagerEx.Instance.MyClientId = cliendId;
 			Debug.Log($"Client has connected : AnotherFakeSteamName");
 		}
 
