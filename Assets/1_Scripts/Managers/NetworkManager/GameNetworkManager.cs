@@ -1,32 +1,27 @@
-using Cysharp.Threading.Tasks;
 using Netcode.Transports.Facepunch;
 using Steamworks;
 using Steamworks.Data;
 using Unity.Netcode;
 using UnityEngine;
 using System;
-using MeowTruck.UI;
 
 namespace MeowTruck.Manager
 {
-	/// <summary>
-	/// SteamworksSDK와 로비 연결을 다룹니다.
-	/// </summary>
 	public class GameNetworkManager : MonoBehaviour
 	{
-		public static GameNetworkManager instance { get; private set; } = null;
-
 		private FacepunchTransport transport = null;
 
 		public Lobby? currentLobby { get; private set; } = null;
 
-		public ulong hostId;
-
+		#region Singleton
+		public static GameNetworkManager Instance { get => instance; }
+		private static GameNetworkManager instance = null;
 		private void Awake()
 		{
 			if (instance == null)
 			{
 				instance = this;
+				DontDestroyOnLoad(gameObject);
 			}
 			else
 			{
@@ -34,114 +29,178 @@ namespace MeowTruck.Manager
 				return;
 			}
 		}
+		#endregion
+		private void Update()
+		{
+			if (NetworkManager.Singleton.IsClient && NetworkManager.Singleton.IsConnectedClient)
+			{
+				ulong ping = NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetCurrentRtt(NetworkManager.ServerClientId);
+				//Debug.Log("PingRtt: " + ping + "ms");
+			}
+		}
 
 		private void Start()
 		{
 			transport = GetComponent<FacepunchTransport>();
-			transport.Initialize();
 
 			SteamMatchmaking.OnLobbyCreated += SteamMatchmaking_OnLobbyCreated;
 			SteamMatchmaking.OnLobbyEntered += SteamMatchmaking_OnLobbyEntered;
-			SteamMatchmaking.OnLobbyMemberJoined += SteamMatchmaking_OnLobbyMemberJoined;
-			SteamMatchmaking.OnLobbyMemberLeave += SteamMatchmaking_OnLobbyMemberLeave;
-			SteamMatchmaking.OnLobbyInvite += SteamMatchmaking_OnLobbyInvite;
+			SteamMatchmaking.OnLobbyMemberJoined += SteamMatchmaking_OnLobbyJoined;
+			SteamMatchmaking.OnLobbyMemberLeave += SteamMatchmaking_OnLobbyLeaved;
+			SteamMatchmaking.OnLobbyInvite += SteamMatchMaking_OnLobbyInvite;
 			SteamMatchmaking.OnLobbyGameCreated += SteamMatchmaking_OnLobbyGameCreated;
 			SteamFriends.OnGameLobbyJoinRequested += SteamFriends_OnGameLobbyJoinRequested;
-
 		}
-
 		private void OnDestroy()
 		{
 			SteamMatchmaking.OnLobbyCreated -= SteamMatchmaking_OnLobbyCreated;
 			SteamMatchmaking.OnLobbyEntered -= SteamMatchmaking_OnLobbyEntered;
-			SteamMatchmaking.OnLobbyMemberJoined -= SteamMatchmaking_OnLobbyMemberJoined;
-			SteamMatchmaking.OnLobbyMemberLeave -= SteamMatchmaking_OnLobbyMemberLeave;
-			SteamMatchmaking.OnLobbyInvite -= SteamMatchmaking_OnLobbyInvite;
+			SteamMatchmaking.OnLobbyMemberJoined -= SteamMatchmaking_OnLobbyJoined;
+			SteamMatchmaking.OnLobbyMemberLeave -= SteamMatchmaking_OnLobbyLeaved;
+			SteamMatchmaking.OnLobbyInvite -= SteamMatchMaking_OnLobbyInvite;
 			SteamMatchmaking.OnLobbyGameCreated -= SteamMatchmaking_OnLobbyGameCreated;
 			SteamFriends.OnGameLobbyJoinRequested -= SteamFriends_OnGameLobbyJoinRequested;
 
-			if (NetworkManager.Singleton == null)
-			{
-				return;
-			}
+			if (NetworkManager.Singleton == null) return;
+
 			NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
 			NetworkManager.Singleton.OnClientConnectedCallback -= Singleton_OnClientConnectedCallback;
-			NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectCallback;
-
+			NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectedCallback;
 		}
-
 		private void OnApplicationQuit()
 		{
 			Disconnected();
 		}
 
-		//when you accept the invite or Join on a friend
+		#region Lobby Callbacks
+		private void SteamMatchmaking_OnLobbyCreated(Result result, Lobby lobby)
+		{
+			if (result != Result.OK)
+			{
+				Debug.Log("Lobby was not created, result: " + result);
+				// TODO - 로비 생성 실패 팝업?
+				return;
+			}
+
+			// 로비 데이터 초기화
+			lobby.SetPublic();
+			lobby.SetJoinable(true);
+			Debug.Log($"Lobby created : {lobby.Owner.Name}");
+
+			// Host 시작
+			StartHost();
+		}
+		private void SteamMatchmaking_OnLobbyEntered(Lobby lobby)
+		{
+			Debug.Log("Lobby entered");
+			if (lobby.Owner.Id == SteamClient.SteamId) return;
+
+			currentLobby = lobby;
+			StartClient(lobby.Owner.Id);
+		}
+		private void SteamMatchmaking_OnLobbyJoined(Lobby lobby, Friend friend)
+		{
+			Debug.Log("member join");
+		}
+
+		// Only Lobby Owner
+		private void SteamMatchmaking_OnLobbyLeaved(Lobby lobby, Friend friend)
+		{
+			Debug.Log("member leave");
+			if (friend.Id == lobby.Owner.Id)
+			{
+				Debug.Log("HOST LEAVED");
+			}
+		}
+		private void SteamMatchMaking_OnLobbyInvite(Friend friend, Lobby lobby)
+		{
+			Debug.Log($"Invite from {friend.Name}");
+		}
+		private void SteamMatchmaking_OnLobbyGameCreated(Lobby lobby, uint ip, ushort port, SteamId steamId)
+		{
+			Debug.Log("LobbyGame created");
+		}
+
+		// Accept the invice or join on a friend
 		private async void SteamFriends_OnGameLobbyJoinRequested(Lobby lobby, SteamId steamId)
 		{
 			RoomEnter joinedLobby = await lobby.Join();
+
 			if (joinedLobby != RoomEnter.Success)
 			{
 				Debug.Log("Failed to create lobby");
 			}
 			else
 			{
-				currentLobby = lobby;
-				GameManagerEx.Instance.ConnectedAsClient();
 				Debug.Log("Joined Lobby");
 			}
 		}
+		#endregion
 
-		private void SteamMatchmaking_OnLobbyGameCreated(Lobby lobby, uint ip, ushort port, SteamId steamId)
+		#region FromLobbyToGame Sequences
+		public void StartHost()
 		{
-			Debug.Log("Lobby was created");
+			Debug.Log("START HOST...");
+			NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
+			NetworkManager.Singleton.StartHost();
+			NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisconnectedCallback;
+			GameManagerEx.Instance.MyClientId = NetworkManager.Singleton.LocalClientId;
+		}
+		public async void CreateLobby()
+		{
+			Debug.Log("Create lobby...");
+			currentLobby = await SteamMatchmaking.CreateLobbyAsync(Constants.MAX_PLAYERS);
+			currentLobby.Value.SetData("HELLO", "HIHI");
+		}
+		public void StartClient(SteamId steamId)
+		{
+			Debug.Log("Start client...");
+			NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
+			NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisconnectedCallback;
+			transport.targetSteamId = steamId.Value;
+			GameManagerEx.Instance.MyClientId = NetworkManager.Singleton.LocalClientId;
+
+			if (NetworkManager.Singleton.StartClient())
+			{
+				Debug.Log("StartClient...");
+			}
+		}
+		public void StartGameInLobby()
+		{
+			if (!NetworkManager.Singleton.IsHost) return;
+
+			currentLobby.Value.SetGameServer(currentLobby.Value.Owner.Id);
+			Debug.Log("Start Game in lobby...");
+			LockLobby();
 		}
 
-		//friend send you an steam invite
-		private void SteamMatchmaking_OnLobbyInvite(Friend steamId, Lobby lobby)
+		// TODO - 나중에 인게임 메뉴 버튼에 할당해야됨
+		public async void Disconnected()
 		{
-			Debug.Log($"Invite from {steamId.Name}");
-		}
+			if (currentLobby == null) return;
+			currentLobby?.Leave();
+			currentLobby = null;
 
-		private void SteamMatchmaking_OnLobbyMemberLeave(Lobby lobby, Friend steamId)
-		{
-			Debug.Log("member leave"); 
-			// GameManagerEx.instance.SendMessageToChat($"{_steamId.Name} has left", _steamId.Id, true);
-			// NetworkTransmission.instance.RemoveMeFromDictionaryServerRPC(_steamId.Id);
-		}
-
-		private void SteamMatchmaking_OnLobbyMemberJoined(Lobby lobby, Friend steamId)
-		{
-			Debug.Log("member join");
-		}
-
-		private void SteamMatchmaking_OnLobbyEntered(Lobby lobby)
-		{
+			if (NetworkManager.Singleton == null) return;
 			if (NetworkManager.Singleton.IsHost)
 			{
-				return;
+				NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
 			}
-			StartClient(currentLobby.Value.Owner.Id);
-
-		}
-
-		private void SteamMatchmaking_OnLobbyCreated(Result result, Lobby lobby)
-		{
-			if (result != Result.OK)
+			else
 			{
-				Debug.Log("lobby was not created");
-				return;
+				NetworkManager.Singleton.OnClientConnectedCallback -= Singleton_OnClientConnectedCallback;
 			}
-			lobby.SetPublic();
-			lobby.SetJoinable(true);
-			Debug.Log($"lobby created");
-		}
 
+			GameManagerEx.Instance.Disconnected();
+			Debug.Log("Disconnected.");
+			NetworkManager.Singleton.Shutdown(true);
+			Debug.Log("Shutdown.");
+		}
 		public async void FindLobbiesWithCallback(Action<Lobby[]> callback)
 		{
-			Debug.Log($"SteamClient.IsValid = {SteamClient.IsValid}");
-			Debug.Log($"SteamId = {SteamClient.SteamId}");
-			var query = SteamMatchmaking.LobbyList;
-//				.WithKeyValue("TEST", "DATAqwe");
+			var query = SteamMatchmaking.LobbyList
+				.WithKeyValue("HELLO", "HIHI")
+				.FilterDistanceClose();
 
 			var lobbies = await query.RequestAsync();
 
@@ -150,7 +209,6 @@ namespace MeowTruck.Manager
 			callback.Invoke(lobbies);
 			return;
 		}
-
 		public async void JoinLobby(Lobby lobby)
 		{
 			try
@@ -162,67 +220,44 @@ namespace MeowTruck.Manager
 				Debug.LogWarning($"Lobby enter failed : {e.Message}");
 			}
 		}
-
-		public async UniTask StartHost(int maxMembers)
+		public void LockLobby()
 		{
-			NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
-			NetworkManager.Singleton.StartHost();
-			GameManagerEx.Instance.MyClientId = NetworkManager.Singleton.LocalClientId;
-			currentLobby = await SteamMatchmaking.CreateLobbyAsync(maxMembers);
-			currentLobby.Value.SetData("TEST", "DATAqwe");
+			currentLobby.Value.SetJoinable(false);
 		}
-
-		public void StartClient(SteamId sId)
+		public void UnlockLobby()
 		{
-			NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
-			NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisconnectCallback;
-			transport.targetSteamId = sId;
-			GameManagerEx.Instance.MyClientId = NetworkManager.Singleton.LocalClientId;
-			if (NetworkManager.Singleton.StartClient())
-			{
-				Debug.Log("Client has started");
-			}
+			currentLobby.Value.SetJoinable(true);
 		}
+		#endregion
 
-		public void Disconnected()
+		private void Singleton_OnClientDisconnectedCallback(ulong clientId)
 		{
-			currentLobby?.Leave();
-			if (NetworkManager.Singleton == null)
-			{
-				return;
-			}
-			if (NetworkManager.Singleton.IsHost)
-			{
-				NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
-			}
-			else
-			{
-				NetworkManager.Singleton.OnClientConnectedCallback -= Singleton_OnClientConnectedCallback;
-			}
-			NetworkManager.Singleton.Shutdown(true);
-			GameManagerEx.Instance.Disconnected();
-			Debug.Log("disconnected");
-		}
-
-		private void Singleton_OnClientDisconnectCallback(ulong cliendId)
-		{
-			NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectCallback;
-			if (cliendId == 0)
+			Debug.Log("Client Disconnected, ClientID: " + clientId);
+			if (clientId == NetworkManager.Singleton.LocalClientId)
 			{
 				Disconnected();
+				NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectedCallback;
 			}
 		}
 
-		private void Singleton_OnClientConnectedCallback(ulong cliendId)
+		public void OpenInviteWindow()
 		{
-			GameManagerEx.Instance.MyClientId = cliendId;
-			Debug.Log($"Client has connected : AnotherFakeSteamName");
+			SteamFriends.OpenGameInviteOverlay(currentLobby.Value.Id);
 		}
 
+		// Both Server and Client
+		private void Singleton_OnClientConnectedCallback(ulong clientId)
+		{
+			if (NetworkManager.Singleton.IsHost) return;
+
+			GameManagerEx.Instance.ConnectedAsClient();
+			GameManagerEx.Instance.MyClientId = clientId;
+		}
 		private void Singleton_OnServerStarted()
 		{
-			Debug.Log("Host started");
+			Debug.Log("OnServerStarted Callback...");
 			GameManagerEx.Instance.HostCreated();
 		}
 	}
+
 }

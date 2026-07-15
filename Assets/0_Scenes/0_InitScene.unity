@@ -492,8 +492,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9edd51781a219914c8cb8a6700997463, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Managers.GameManagerEx
-  playerPrefab: {fileID: 6641076352189412669, guid: a4b54a68e14e980468446f8f1e47dcac, type: 3}
-  spawnPoints: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

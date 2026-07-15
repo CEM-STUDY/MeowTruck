@@ -13,15 +13,16 @@ namespace MeowTruck.UI
 		private async void OnEnable()
 		{
 			hostButton.onClick.AddListener(() => { StartLobby().Forget(); });
-			clientButton.onClick.AddListener(() =>
+			clientButton.onClick.AddListener(async () =>
 			{
-				GameNetworkManager.instance.FindLobbiesWithCallback((lobbies) => GameNetworkManager.instance.JoinLobby(lobbies[0]));
+				Debug.Log("CLICK");
+				GameNetworkManager.Instance.FindLobbiesWithCallback((lobbies) => GameNetworkManager.Instance.JoinLobby(lobbies[0]));
 			});
 		}
 
 		private async UniTaskVoid StartLobby()
 		{
-			await GameNetworkManager.instance.StartHost(Constants.MAX_PLAYERS); 
+			GameNetworkManager.Instance.StartHost(); 
 			Managers.Scene.ChangeScene(Constants.SCENE_LOBBY);
 		}
 
