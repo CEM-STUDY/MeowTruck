@@ -1,8 +1,8 @@
 using MeowTruck.Manager;
 using System.Collections;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 namespace MeowTruck.Controllers
 {
@@ -21,7 +21,7 @@ namespace MeowTruck.Controllers
 
             string nextScene = Managers.Scene.NextScene;
 
-			if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+			if (NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening)
             {
 				if (!NetworkManager.Singleton.IsHost)
 				{
@@ -34,9 +34,9 @@ namespace MeowTruck.Controllers
             }
             else
             {
-                SceneManager.LoadSceneAsync(
+				SceneManager.LoadSceneAsync(
                     nextScene,
-                    LoadSceneMode.Single);
+					LoadSceneMode.Single);
             }
 		}
 	}

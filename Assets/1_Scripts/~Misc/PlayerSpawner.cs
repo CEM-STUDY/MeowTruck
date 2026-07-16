@@ -1,15 +1,14 @@
-using MeowTruck.Manager;
 using Unity.Netcode;
 using UnityEngine;
 
 namespace MeowTruck.Misc
 {
-	public class PlayerSpawner : MonoBehaviour
+	public class PlayerSpawner : NetworkBehaviour
 	{
 		[Header("PlayerSpawn")]
 		[SerializeField] private GameObject playerPrefab;
 
-		private void Start()
+		protected override void OnNetworkPostSpawn()
 		{
 			SpawnPlayerObject();
 		}
@@ -20,9 +19,15 @@ namespace MeowTruck.Misc
 			{
 				if (NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject() != null) return;
 
-				var player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
-				player.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.LocalClientId);
+				SpawnPlayerObjectServerRPC(NetworkManager.Singleton.LocalClientId);
 			}
+		}
+
+		[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+		public void SpawnPlayerObjectServerRPC(ulong clientId)
+		{
+			var player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+			player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
 		}
 	}
 }

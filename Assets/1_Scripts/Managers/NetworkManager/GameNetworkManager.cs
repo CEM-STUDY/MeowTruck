@@ -2,7 +2,6 @@
 using Netcode.Transports.Facepunch;
 using Steamworks;
 using Steamworks.Data;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace MeowTruck.Manager
@@ -13,9 +12,9 @@ namespace MeowTruck.Manager
 	/// - NetworkManager 관련 API 제공 및 콜백 관리
 	/// 
 	/// </summary>
-	public class SteamManager : MonoBehaviour
+	public class GameNetworkManager : MonoBehaviour
 	{
-		public static SteamManager Instance { get; private set; } = null;
+		public static GameNetworkManager Instance { get; private set; } = null;
 
 		public static SteamCloud Cloud { get; private set; } = new SteamCloud();
 		public static SteamAchievement Achieve { get; private set; } = new SteamAchievement();
@@ -47,7 +46,7 @@ namespace MeowTruck.Manager
 			Lobby.OnEnable();
 
 			Lobby.OnGameLobbyJoinRequested += ((lobby, steamId) => { CurrentLobby = lobby; });
-			Lobby.OnLobbyEntered += ((lobby) => { if (!NetworkManager.Singleton.IsHost) StartClient(lobby.Owner.Id); });
+			Lobby.OnLobbyEntered += ((lobby) => { if (!Unity.Netcode.NetworkManager.Singleton.IsHost) StartClient(lobby.Owner.Id); });
 			Lobby.OnLobbyCreated += ((result, lobby) =>
 			{
 				lobby.SetPublic();
@@ -60,13 +59,13 @@ namespace MeowTruck.Manager
 		{
 			Lobby.OnDisable();
 
-			if (NetworkManager.Singleton == null)
+			if (Unity.Netcode.NetworkManager.Singleton == null)
 			{
 				return;
 			}
-			NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
-			NetworkManager.Singleton.OnClientConnectedCallback -= Singleton_OnClientConnectedCallback;
-			NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectCallback;
+			Unity.Netcode.NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
+			Unity.Netcode.NetworkManager.Singleton.OnClientConnectedCallback -= Singleton_OnClientConnectedCallback;
+			Unity.Netcode.NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectCallback;
 		}
 
 		private void Update()
@@ -83,17 +82,17 @@ namespace MeowTruck.Manager
 
 		public async UniTask StartHost(int maxMembers)
 		{
-			NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
-			NetworkManager.Singleton.StartHost();
+			Unity.Netcode.NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
+			Unity.Netcode.NetworkManager.Singleton.StartHost();
 			CurrentLobby = await SteamMatchmaking.CreateLobbyAsync(maxMembers);
 		}
 
 		public void StartClient(SteamId sId)
 		{
-			NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
-			NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisconnectCallback;
+			Unity.Netcode.NetworkManager.Singleton.OnClientConnectedCallback += Singleton_OnClientConnectedCallback;
+			Unity.Netcode.NetworkManager.Singleton.OnClientDisconnectCallback += Singleton_OnClientDisconnectCallback;
 			transport.targetSteamId = sId;
-			if (NetworkManager.Singleton.StartClient())
+			if (Unity.Netcode.NetworkManager.Singleton.StartClient())
 			{
 				Debug.Log("Client has started");
 			}
@@ -102,25 +101,25 @@ namespace MeowTruck.Manager
 		public void Disconnected()
 		{
 			CurrentLobby?.Leave();
-			if (NetworkManager.Singleton == null)
+			if (Unity.Netcode.NetworkManager.Singleton == null)
 			{
 				return;
 			}
-			if (NetworkManager.Singleton.IsHost)
+			if (Unity.Netcode.NetworkManager.Singleton.IsHost)
 			{
-				NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
+				Unity.Netcode.NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
 			}
 			else
 			{
-				NetworkManager.Singleton.OnClientConnectedCallback -= Singleton_OnClientConnectedCallback;
+				Unity.Netcode.NetworkManager.Singleton.OnClientConnectedCallback -= Singleton_OnClientConnectedCallback;
 			}
-			NetworkManager.Singleton.Shutdown(true);
+			Unity.Netcode.NetworkManager.Singleton.Shutdown(true);
 			Debug.Log("Disconnected");
 		}
 
 		private void Singleton_OnClientDisconnectCallback(ulong cliendId)
 		{
-			NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectCallback;
+			Unity.Netcode.NetworkManager.Singleton.OnClientDisconnectCallback -= Singleton_OnClientDisconnectCallback;
 			if (cliendId == 0)
 			{
 				Disconnected();

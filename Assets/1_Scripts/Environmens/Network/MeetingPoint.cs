@@ -75,7 +75,7 @@ namespace MeowTruck.Environments
 
 			if (!IsHost) return;
 
-			isMeeting = (playerCount == NetworkManager.Singleton.ConnectedClients.Count);
+			isMeeting = (playerCount == Unity.Netcode.NetworkManager.Singleton.ConnectedClients.Count);
 			if (isMeeting)
 			{
 				elapsedTime.Value += Time.deltaTime;

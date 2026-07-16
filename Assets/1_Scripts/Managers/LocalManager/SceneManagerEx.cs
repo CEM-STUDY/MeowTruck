@@ -12,15 +12,15 @@ namespace MeowTruck.Manager
 		{
 			NextScene = sceneName;
 
-			if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+			if (Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening)
 			{
-				if (!NetworkManager.Singleton.IsHost)
+				if (!Unity.Netcode.NetworkManager.Singleton.IsHost)
 				{
 					Debug.LogWarning("[SceneManager] - Change NetworkScene from client");
 					return;
 				}
 
-				NetworkManager.Singleton.SceneManager.LoadScene(
+				Unity.Netcode.NetworkManager.Singleton.SceneManager.LoadScene(
 					Constants.SCENE_TRANSITION,
 					LoadSceneMode.Single);
 			}

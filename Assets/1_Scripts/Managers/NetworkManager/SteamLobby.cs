@@ -47,8 +47,10 @@ namespace MeowTruck.Manager
 		{
 			try
 			{
-				var lobbies = await SteamMatchmaking.LobbyList.RequestAsync();
+				var query = SteamMatchmaking.LobbyList
+					.WithKeyValue(Constants.KEY_GAMENAME, Constants.KEY_GAMENAME);
 
+				var lobbies = await query.RequestAsync();
 				if (lobbies == null) return;
 
 				callback?.Invoke(lobbies);

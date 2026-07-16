@@ -119,6 +119,78 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &97897905
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 97897906}
+  - component: {fileID: 97897907}
+  - component: {fileID: 97897908}
+  m_Layer: 0
+  m_Name: PlayerSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &97897906
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 97897905}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 869.83856, y: 403.8207, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &97897907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 97897905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1468863906
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 0
+  AllowOwnerToParent: 0
+--- !u!114 &97897908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 97897905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e518740571de434f954c2053c71109e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Misc.PlayerSpawner
+  ShowTopMostFoldoutHeaderGroup: 1
+  playerPrefab: {fileID: 6641076352189412669, guid: a4b54a68e14e980468446f8f1e47dcac, type: 3}
 --- !u!1 &133101339
 GameObject:
   m_ObjectHideFlags: 0
@@ -1117,7 +1189,6 @@ GameObject:
   - component: {fileID: 1408556232}
   - component: {fileID: 1408556231}
   - component: {fileID: 1408556235}
-  - component: {fileID: 1408556236}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1226,19 +1297,6 @@ MonoBehaviour:
   chatPanel: {fileID: 323751949}
   chatInputField: {fileID: 1684162761}
   chatPrefab: {fileID: 5663318713107243551, guid: dcfb0bd220fdc8d4b9cbdab828af258c, type: 3}
---- !u!114 &1408556236
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1408556229}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e518740571de434f954c2053c71109e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Misc.PlayerSpawner
-  playerPrefab: {fileID: 6641076352189412669, guid: a4b54a68e14e980468446f8f1e47dcac, type: 3}
 --- !u!1 &1427307550
 GameObject:
   m_ObjectHideFlags: 0
@@ -1988,3 +2046,4 @@ SceneRoots:
   - {fileID: 1408556234}
   - {fileID: 1234263618}
   - {fileID: 495823548}
+  - {fileID: 97897906}
