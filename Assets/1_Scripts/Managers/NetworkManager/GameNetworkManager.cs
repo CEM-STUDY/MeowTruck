@@ -8,7 +8,7 @@ namespace MeowTruck.Manager
 {
 	/// <summary>
 	/// 
-	/// - Steam과 관련된 매니저들을 관리
+	/// - 네트워크와 관련된 매니저들 관리
 	/// - NetworkManager 관련 API 제공 및 콜백 관리
 	/// 
 	/// </summary>
