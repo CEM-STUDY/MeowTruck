@@ -21,7 +21,7 @@ namespace MeowTruck.Misc
 				if (NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject() != null) return;
 
 				var player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
-				player.GetComponent<NetworkObject>().SpawnAsPlayerObject(GameManagerEx.Instance.MyClientId);
+				player.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkManager.Singleton.LocalClientId);
 			}
 		}
 	}

@@ -43,7 +43,6 @@ namespace MeowTruck.UI
 						chatInputField.DeactivateInputField();
 						return;
 					}
-					// NetworkTransmission.instance.IWishToSendAChatServerRPC(chatInputField.text, NetworkManager.Singleton.LocalClientId);
 					chatInputField.text = "";
 				}
 			}

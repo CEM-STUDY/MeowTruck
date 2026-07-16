@@ -25,10 +25,7 @@ namespace MeowTruck.Manager
 			}
 		}
 
-
-		private static SceneManagerEx scene = new SceneManagerEx();
-
-		public static SceneManagerEx Scene => scene;
+		public static SceneManagerEx Scene { get; private set; } = new SceneManagerEx();
 
 	}
 }

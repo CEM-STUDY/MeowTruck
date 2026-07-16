@@ -17,5 +17,9 @@ namespace MeowTruck
 		public static readonly string SCENE_GAME = "3_GameScene";
 
 		public static readonly string SCENE_TRANSITION = "_TransitionScene";
+
+		/** Key-Value **/
+		public static readonly string KEY_GAMENAME = "GameName";
+		public static readonly string VALUE_GAMENAME = "MeowTruck";
 	}
 }
