@@ -138,6 +138,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   interactDistance: 2
+  itemLayer:
+    serializedVersion: 2
+    m_Bits: 4096
+  itemDetectOffset: {x: 0, y: -0.3}
+  itemDetectRange: 0.43
   moveSpeed: 3
   dashSpeed: 15
   dashDuration: 0.25

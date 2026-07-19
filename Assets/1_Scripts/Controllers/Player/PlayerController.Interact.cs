@@ -1,6 +1,6 @@
 using MeowTruck.Interactables;
+using MeowTruck.Items;
 using MeowTruck.Manager;
-using Mono.Cecil.Cil;
 using UnityEngine;
 
 namespace MeowTruck.Controllers
@@ -8,8 +8,12 @@ namespace MeowTruck.Controllers
 	public partial class PlayerController
 	{
 		[Header("Interacts")]
-		[SerializeField] private LayerMask interactLayer; 
+		[SerializeField] private LayerMask interactLayer;
 		[SerializeField] private float interactDistance;
+
+		[SerializeField] private LayerMask itemLayer;
+		[SerializeField] private Vector2 itemDetectOffset;
+		[SerializeField] private float itemDetectRange;
 
 		public InteractableBase CurrentInteractable { get; private set; } = null;
 
@@ -31,6 +35,43 @@ namespace MeowTruck.Controllers
 			// CurrentInteractable 게이지 증가
 		}
 
+		public void TryPickUpItem()
+		{
+			if (!Managers.Input.Control.Player.Interact.WasPressedThisFrame()) return;
+
+			Collider2D[] hits = Physics2D.OverlapCircleAll(
+				transform.position + itemDetectOffset.ToVec3(),
+				itemDetectRange,
+				itemLayer);
+
+			if (hits.Length == 0)
+				return;
+
+			DropItem nearestItem = null;
+			float nearestDistance = float.MaxValue;
+
+			foreach (Collider2D hit in hits)
+			{
+				DropItem item = hit.GetComponent<DropItem>();
+				if (item == null)
+					continue;
+
+				float sqrDistance = (item.transform.position - transform.position).sqrMagnitude;
+
+				if (sqrDistance < nearestDistance)
+				{
+					nearestDistance = sqrDistance;
+					nearestItem = item;
+				}
+			}
+
+			if (nearestItem == null)
+				return;
+
+			nearestItem.TryGetItem();
+			Managers.Input.Control.Player.Interact.Reset();
+		}
+
 		public void TryInteract()
 		{
 			if (!Managers.Input.Control.Player.Interact.WasPressedThisFrame()) return;
@@ -46,6 +87,7 @@ namespace MeowTruck.Controllers
 			hit.collider.GetComponent<InteractableBase>()?.TryGetOwnershipServerRPC(OwnerClientId);
 		}
 
+
 		private void OnDrawGizmos()
 		{
 			Color prev = Gizmos.color;
@@ -56,6 +98,9 @@ namespace MeowTruck.Controllers
 
 			Gizmos.DrawLine(start, end);
 			Gizmos.DrawSphere(end, 0.08f);
+
+			Gizmos.color = Color.red;
+			Gizmos.DrawWireSphere(transform.position + itemDetectOffset.ToVec3(), itemDetectRange);
 
 			Gizmos.color = prev;
 		}

@@ -1,12 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MeowTruck.Data;
+using UnityEngine;
 
-namespace Assets._1_Scripts.Items
+namespace MeowTruck.Items
 {
-	internal class ItemBase
+	// 
+	public class ItemBase : MonoBehaviour
 	{
+		[SerializeField] private ItemData itemData;
+
+		
 	}
 }

@@ -50,6 +50,7 @@ namespace MeowTruck.Controllers
 			if (!IsOwner) return;
 
 			RecordPrevDir();
+			TryPickUpItem();
 			TryInteract();
 
 			stateMachine.CurState.OnUpdate();

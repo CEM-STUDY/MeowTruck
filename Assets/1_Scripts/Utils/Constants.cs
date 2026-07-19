@@ -10,6 +10,7 @@ namespace MeowTruck
 		/** Layers **/
 		public static readonly LayerMask LAYER_PLAYER = 1 << 10;
 		public static readonly LayerMask LAYER_INTERACT = 1 << 11;
+		public static readonly LayerMask LAYER_ITEM = 1 << 12;
 
 		/** Scene Names **/
 		public static readonly string SCENE_INIT = "0_InitScene";
