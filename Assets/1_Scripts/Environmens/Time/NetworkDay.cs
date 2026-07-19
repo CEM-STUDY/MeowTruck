@@ -1,4 +1,5 @@
 ﻿using System;
+using MeowTruck;
 using MeowTruck.Manager;
 using Unity.Netcode;
 using UnityEngine;
@@ -16,11 +17,6 @@ public class NetworkDay : NetworkBehaviour
 
     [Header("Cycle")]
     [SerializeField, Min(1f)] private float cycleLengthSeconds = 600f;
-
-    [Header("Scene Rules")]
-    [SerializeField] private string villageSceneName = "3_VillageScene";
-    [SerializeField] private string foodTruckSceneName = "4_FoodTruckScene";
-    [SerializeField] private string fieldSceneName = "5_FieldScene";
 
     public NetworkVariable<double> CycleStartedAt = new();  // 시간 진행을 시작한 서버 시각
     public NetworkVariable<float> CyclePosition = new(0f);  // 진행을 멈췄을 때 저장한 낮/밤 위치
@@ -80,7 +76,7 @@ public class NetworkDay : NetworkBehaviour
         base.OnNetworkDespawn();
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
         if (Instance == this)
             Instance = null;
@@ -101,7 +97,7 @@ public class NetworkDay : NetworkBehaviour
         if (IsServer && currentPeriod == DayPeriod.Day)
             DayNumber.Value++;
 
-        if (IsServer && SceneManager.GetActiveScene().name == foodTruckSceneName)
+        if (IsServer && SceneManager.GetActiveScene().name == Constants.SCENE_FOOD_TRUCK)
         {
             FinishFoodTruckPeriod(currentPeriod);
         }
@@ -116,37 +112,49 @@ public class NetworkDay : NetworkBehaviour
     {
         string sceneName = scene.name;
 
-        // Transition scenes are ignored so the actual departure scene is retained.
-        if (sceneName == villageSceneName)
+        if (sceneName == Constants.SCENE_VILLAGE)
         {
             PauseCycle();
 
-            if (lastGameplaySceneName == fieldSceneName)
+            if (lastGameplaySceneName == Constants.SCENE_FIELD)
                 AdvanceToNextPeriod();
 
-            lastGameplaySceneName = villageSceneName;
+            lastGameplaySceneName = Constants.SCENE_VILLAGE;
             foodTruckExitRequested = false;
             return;
         }
 
-        if (sceneName == foodTruckSceneName)
+        if (sceneName == Constants.SCENE_FOOD_TRUCK)
         {
-            lastGameplaySceneName = foodTruckSceneName;
+            lastGameplaySceneName = Constants.SCENE_FOOD_TRUCK;
             foodTruckExitRequested = false;
 
-            ResumeCycle();
+            PauseCycle();
 
             return;
         }
 
-        if (sceneName == fieldSceneName)
+        if (sceneName == Constants.SCENE_FIELD)
         {
-            lastGameplaySceneName = fieldSceneName;
+            lastGameplaySceneName = Constants.SCENE_FIELD;
             PauseCycle();
             return;
         }
 
         PauseCycle();
+    }
+
+    public bool StartFoodTruckPeriod()
+    {
+        if (!IsServer || SceneManager.GetActiveScene().name != Constants.SCENE_FOOD_TRUCK)
+            return false;
+
+        if (IsRunning.Value)
+            return false;
+
+        foodTruckExitRequested = false;
+        ResumeCycle();
+        return true;
     }
 
     private void ResumeCycle()
@@ -178,7 +186,7 @@ public class NetworkDay : NetworkBehaviour
         PauseCycle();
 
         CyclePosition.Value = arrivedPeriod == DayPeriod.Day ? 0f : 0.5f;
-        NetworkManager.SceneManager.LoadScene(villageSceneName, LoadSceneMode.Single);
+        NetworkManager.SceneManager.LoadScene(Constants.SCENE_VILLAGE, LoadSceneMode.Single);
     }
 
     private void AdvanceToNextPeriod()

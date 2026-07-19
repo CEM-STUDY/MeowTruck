@@ -14,17 +14,31 @@ public class FoodTruckUI : MonoBehaviour
 
     private void OnEnable()
     {
-        bool isHost = NetworkManager.Singleton.IsHost;
+        bool isHost = NetworkManager.Singleton != null && NetworkManager.Singleton.IsHost;
 
         startButton.gameObject.SetActive(isHost);
 
         if (isHost)
+        {
+            startButton.interactable = NetworkDay.Instance != null &&
+                !NetworkDay.Instance.IsRunning.Value;
             startButton.onClick.AddListener(StartFoodTruck);
+        }
     }
 
     private void StartFoodTruck()
     {
-        Debug.Log("Start Food Truck!");
+        if (NetworkDay.Instance == null)
+        {
+            Debug.LogError("[FoodTruckUI] NetworkDay has not been spawned.");
+            return;
+        }
+
+        if (!NetworkDay.Instance.StartFoodTruckPeriod())
+            return;
+
+        startButton.gameObject.SetActive(false);
+        Debug.Log("[FoodTruckUI] Food truck time started.");
     }
 
     private void OnDisable()
