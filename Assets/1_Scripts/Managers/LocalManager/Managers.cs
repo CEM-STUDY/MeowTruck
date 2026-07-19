@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace MeowTruck.Manager
 {
@@ -23,9 +24,12 @@ namespace MeowTruck.Manager
 			{
 				Destroy(gameObject);
 			}
+
+			Input.Init();
 		}
 
 		public static SceneManagerEx Scene { get; private set; } = new SceneManagerEx();
+		public static InputManager Input { get; private set; } = new InputManager();
 
 	}
 }
