@@ -1,34 +1,51 @@
+using MeowTruck.Environments;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FoodTruckUI : MonoBehaviour
+namespace MeowTruck.UI
 {
-    [SerializeField] private Button startButton;
-
-
-    private void Awake()
+    public class FoodTruckUI : MonoBehaviour
     {
-        Debug.Log("Ready for Food Truck");
-    }
+        [SerializeField] private Button startButton;
 
-    private void OnEnable()
-    {
-        bool isHost = NetworkManager.Singleton.IsHost;
 
-        startButton.gameObject.SetActive(isHost);
+        private void Awake()
+        {
+            Debug.Log("Ready for Food Truck");
+        }
 
-        if (isHost)
-            startButton.onClick.AddListener(StartFoodTruck);
-    }
+        private void OnEnable()
+        {
+            bool isHost = NetworkManager.Singleton != null && NetworkManager.Singleton.IsHost;
 
-    private void StartFoodTruck()
-    {
-        Debug.Log("Start Food Truck!");
-    }
+            startButton.gameObject.SetActive(isHost);
 
-    private void OnDisable()
-    {
-        startButton.onClick.RemoveListener(StartFoodTruck);
+            if (isHost)
+            {
+                startButton.interactable = NetworkDay.Instance != null &&
+                    !NetworkDay.Instance.IsRunning.Value;
+                startButton.onClick.AddListener(StartFoodTruck);
+            }
+        }
+
+        private void StartFoodTruck()
+        {
+            if (NetworkDay.Instance == null)
+            {
+                Debug.LogError("[FoodTruckUI] NetworkDay has not been spawned.");
+                return;
+            }
+
+            if (!NetworkDay.Instance.StartFoodTruckPeriod())
+                return;
+            startButton.gameObject.SetActive(false);
+            Debug.Log("[FoodTruckUI] Food truck time started.");
+        }
+
+        private void OnDisable()
+        {
+            startButton.onClick.RemoveListener(StartFoodTruck);
+        }
     }
 }
