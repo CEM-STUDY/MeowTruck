@@ -82,7 +82,7 @@ namespace MeowTruck.Environments
 				if (elapsedTime.Value > maxTime)
 				{
 					// TODO - 게이지 다 차면 할 일 작성
-					Managers.Scene.ChangeScene(Constants.SCENE_GAME);
+					Managers.Scene.ChangeScene(Constants.SCENE_VILLAGE);
 				}
 			}
 			else
