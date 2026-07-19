@@ -18,8 +18,14 @@ EditorBuildSettings:
     path: Assets/0_Scenes/2_LobbyScene.unity
     guid: 40162b02a23a2814a8d259eb53daad3e
   - enabled: 1
-    path: Assets/0_Scenes/3_GameScene.unity
+    path: Assets/0_Scenes/3_VillageScene.unity
     guid: 35227c16ab6b5a948a7a2b889a77ac07
+  - enabled: 1
+    path: Assets/0_Scenes/4_FoodTruckScene.unity
+    guid: 30413c0ce0b7ff94d950487756ce7fca
+  - enabled: 1
+    path: Assets/0_Scenes/5_FieldScene.unity
+    guid: 8ea07210204e5a64e9950c3eb36fc2a6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

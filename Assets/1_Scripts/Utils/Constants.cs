@@ -16,7 +16,9 @@ namespace MeowTruck
 		public static readonly string SCENE_INIT = "0_InitScene";
 		public static readonly string SCENE_MAIN = "1_MainScene";
 		public static readonly string SCENE_LOBBY = "2_LobbyScene";
-		public static readonly string SCENE_GAME = "3_GameScene";
+		public static readonly string SCENE_VILLAGE = "3_VillageScene";
+		public static readonly string SCENE_FOOD_TRUCK = "4_FoodTruckScene";
+		public static readonly string SCENE_FIELD = "5_FieldScene";
 
 		public static readonly string SCENE_TRANSITION = "_TransitionScene";
 
