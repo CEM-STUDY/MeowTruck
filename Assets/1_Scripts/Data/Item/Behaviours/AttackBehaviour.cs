@@ -3,13 +3,14 @@ using UnityEngine;
 
 namespace MeowTruck.Data
 {
-	[CreateAssetMenu(fileName = "Attack Behaviour", menuName = "Behaviour/Attack")]
-	public class AttackBehaviour : ItemUseBehaviour
+	public abstract class AttackBehaviour : ItemUseBehaviour
 	{
 		public override bool Use(PlayerController controller, ItemData data)
 		{
-			controller.Attack(data);
+			controller.Attack();
 			return true;
 		}
+
+		public abstract bool Attack(PlayerController controller, Vector2 dir, LayerMask targetLayer);
 	}
 }

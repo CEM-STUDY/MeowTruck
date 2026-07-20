@@ -46,7 +46,8 @@ namespace MeowTruck.Controllers
 		}
 		protected bool CheckIsAbleToUse()
 		{
-			if (EventSystem.current.IsPointerOverGameObject()) return false;
+			if (EventSystem.current == null ||
+				EventSystem.current.IsPointerOverGameObject()) return false;
 			if (!Managers.Input.Control.Player.Use.WasPressedThisFrame()) return false;
 
 			controller.UseCurrentItem();

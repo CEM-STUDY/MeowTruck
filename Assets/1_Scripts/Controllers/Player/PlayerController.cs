@@ -27,11 +27,14 @@ namespace MeowTruck.Controllers
 		[Header("Interacts")]
 		[SerializeField] private LayerMask interactLayer;
 		[SerializeField] private float interactDistance;
+		[Space(20)]
 
 		[SerializeField] private LayerMask itemLayer;
 		[SerializeField] private Vector2 itemDetectOffset;
 		[SerializeField] private float itemDetectRange;
 		[Space(20)]
+
+		[SerializeField] private LayerMask attackTargetLayer;
 
 		private List<int> animIds = new();
 		private PlayerController instance = null;
@@ -44,7 +47,7 @@ namespace MeowTruck.Controllers
 		private bool isDashing = false;
 		public bool IsDashing => isDashing;
 
-		private Vector2 prevDir = Vector2.right;
+		private Vector2 currentDir = Vector2.right;
 
 		private NetworkVariable<int> selectedItemId = new(-1, writePerm: NetworkVariableWritePermission.Owner);
 
@@ -90,7 +93,7 @@ namespace MeowTruck.Controllers
 		{
 			if (!IsOwner) return;
 
-			RecordPrevDir();
+			CalculateCurrentDir();
 			TryPickUpItem();
 			TryInteract();
 
@@ -125,10 +128,9 @@ namespace MeowTruck.Controllers
 
 			isDashing = false;
 		}
-		public void Attack(ItemData itemData)
+		public void Attack()
 		{
 			// Called from ItemUseBehaviour
-			// TODO - 방향 고려 필요
 			stateMachine.ChangeState(stateMachine.Attack);
 		}
 
@@ -136,12 +138,23 @@ namespace MeowTruck.Controllers
 		{
 			Managers.Inventory.UseCurrentSelectedItem(this);
 		}
-		private void RecordPrevDir()
+		private void CalculateCurrentDir()
 		{
-			Vector2 dir = Managers.Input.Control.Player.Move.ReadValue<Vector2>();
-			if (dir.sqrMagnitude < 0.001f) return;
+			Vector2 screenPos = Managers.Input.Control.Player.MousePos.ReadValue<Vector2>();
+			Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
+			worldPos.z = 0f;
 
-			prevDir = dir;
+			currentDir = (worldPos - transform.position).ToVec2().normalized;
+		}
+
+		[Rpc(SendTo.Server)]
+		public void AttackServerRPC(Vector2 direction)
+		{
+			ItemData itemData = Managers.Resource.GetItemData(selectedItemId.Value);
+			if (itemData.UseBehaviour is AttackBehaviour attackBehaviour)
+			{
+				attackBehaviour.Attack(this, direction, attackTargetLayer);
+			}
 		}
 
 		public void SetAnimatorParam(AnimParamType type) => animator.SetTrigger(animIds[(int)type]);

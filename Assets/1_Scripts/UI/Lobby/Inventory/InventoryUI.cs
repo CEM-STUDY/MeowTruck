@@ -8,7 +8,7 @@ namespace MeowTruck.UI
 {
 	public class InventoryUI : MonoBehaviour
     {
-        private List<ItemSlot> slots = new();
+		private List<ItemSlot> slots = new();
 
 		private void Awake()
 		{

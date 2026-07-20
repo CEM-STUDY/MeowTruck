@@ -9,6 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 596af211b2ccb0c4d8f4703e338643d9, type: 3}
-  m_Name: Attack Behaviour
-  m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Data.AttackBehaviour
+  m_Script: {fileID: 11500000, guid: 28bc80e71cf535d44bf3f0c4c485564d, type: 3}
+  m_Name: Test Sword Behaviour
+  m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Data.SwordBehaviour
+  damage: 10
+  distance: 1
+  boxSize: {x: 1.2, y: 0.8}

@@ -1,6 +1,5 @@
 using MeowTruck.Data;
 using MeowTruck.Manager;
-using UnityEngine;
 
 namespace MeowTruck.Controllers
 {
@@ -36,9 +35,9 @@ namespace MeowTruck.Controllers
 		/** Animation Events**/
 		public void OnAttackHit()
 		{
-			if (!IsHost) return;		// 피격 판정은 서버에서
+			if (!IsOwner) return;
 
-			Debug.Log("On Attack Hit!");
+			AttackServerRPC(currentDir);
 		}
 
 		public void OnAttackEnd()

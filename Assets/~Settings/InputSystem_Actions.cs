@@ -138,6 +138,15 @@ namespace MeowTruck
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MousePos"",
+                    ""type"": ""Value"",
+                    ""id"": ""ba2d1204-4f5c-4cee-8b94-7fe9792e6aa7"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -294,6 +303,17 @@ namespace MeowTruck
                     ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""90e6485a-6d19-4bac-995a-042545edaef3"",
+                    ""path"": ""<Pointer>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""MousePos"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -374,6 +394,7 @@ namespace MeowTruck
             m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
             m_Player_Run = m_Player.FindAction("Run", throwIfNotFound: true);
             m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
+            m_Player_MousePos = m_Player.FindAction("MousePos", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         }
@@ -462,6 +483,7 @@ namespace MeowTruck
         private readonly InputAction m_Player_Interact;
         private readonly InputAction m_Player_Run;
         private readonly InputAction m_Player_Dash;
+        private readonly InputAction m_Player_MousePos;
         /// <summary>
         /// Provides access to input actions defined in input action map "Player".
         /// </summary>
@@ -493,6 +515,10 @@ namespace MeowTruck
             /// Provides access to the underlying input action "Player/Dash".
             /// </summary>
             public InputAction @Dash => m_Wrapper.m_Player_Dash;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/MousePos".
+            /// </summary>
+            public InputAction @MousePos => m_Wrapper.m_Player_MousePos;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -534,6 +560,9 @@ namespace MeowTruck
                 @Dash.started += instance.OnDash;
                 @Dash.performed += instance.OnDash;
                 @Dash.canceled += instance.OnDash;
+                @MousePos.started += instance.OnMousePos;
+                @MousePos.performed += instance.OnMousePos;
+                @MousePos.canceled += instance.OnMousePos;
             }
 
             /// <summary>
@@ -560,6 +589,9 @@ namespace MeowTruck
                 @Dash.started -= instance.OnDash;
                 @Dash.performed -= instance.OnDash;
                 @Dash.canceled -= instance.OnDash;
+                @MousePos.started -= instance.OnMousePos;
+                @MousePos.performed -= instance.OnMousePos;
+                @MousePos.canceled -= instance.OnMousePos;
             }
 
             /// <summary>
@@ -785,6 +817,13 @@ namespace MeowTruck
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnDash(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "MousePos" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnMousePos(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

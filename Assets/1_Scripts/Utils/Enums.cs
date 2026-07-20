@@ -4,4 +4,11 @@ namespace MeowTruck
 	{
 		Attack,
 	}
+
+	public enum EntityType
+	{
+		Character,
+		Resource,
+		Structure,
+	}
 }

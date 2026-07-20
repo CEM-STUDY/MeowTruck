@@ -1,6 +1,7 @@
 using MeowTruck.Interactables;
 using MeowTruck.Items;
 using MeowTruck.Manager;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MeowTruck.Controllers
@@ -75,31 +76,13 @@ namespace MeowTruck.Controllers
 
 			RaycastHit2D hit = Physics2D.Raycast(
 				transform.position,
-				prevDir,
+				currentDir,
 				interactDistance,
 				interactLayer);
 
 			if (hit.collider == null) return;
 
 			hit.collider.GetComponent<InteractableBase>()?.TryGetOwnershipServerRPC(OwnerClientId);
-		}
-
-
-		private void OnDrawGizmos()
-		{
-			Color prev = Gizmos.color;
-			Gizmos.color = Color.red;
-
-			Vector3 start = transform.position;
-			Vector3 end = start + (Vector3)(prevDir.normalized * interactDistance);
-
-			Gizmos.DrawLine(start, end);
-			Gizmos.DrawSphere(end, 0.08f);
-
-			Gizmos.color = Color.red;
-			Gizmos.DrawWireSphere(transform.position + itemDetectOffset.ToVec3(), itemDetectRange);
-
-			Gizmos.color = prev;
 		}
 	}
 }

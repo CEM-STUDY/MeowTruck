@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0d3574c34178694dabf6bcba928a28c, type: 3}
-  m_Name: 03_ItemData
+  m_Name: 01_ItemData
   m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Data.ItemData
-  itemID: 3
-  isConsumable: 1
+  itemID: 1
+  itemName: 
+  isConsumable: 0
   maxStack: 99
-  itemSprite: {fileID: 21300000, guid: 9ef682c8222c65c4bbbf1c7dce6936d0, type: 3}
-  useBehaviour: {fileID: 11400000, guid: f99628b24ddd03744891aaa67f6e7936, type: 2}
+  itemSprite: {fileID: 21300000, guid: 87a073233461a0e4aa9e27d1762c903c, type: 3}
+  useBehaviour: {fileID: 11400000, guid: 4459a3c5f85912c4cb694a4277d50e3a, type: 2}
