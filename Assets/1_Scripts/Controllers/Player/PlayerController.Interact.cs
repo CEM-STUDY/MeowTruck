@@ -12,7 +12,6 @@ namespace MeowTruck.Controllers
 	/// </summary>
 	public partial class PlayerController
 	{
-
 		public InteractableBase CurrentInteractable { get; private set; } = null;
 
 		public void SetCurrentInteractable(InteractableBase interactables)

@@ -34,9 +34,17 @@ namespace MeowTruck.Controllers
 		}
 
 		/** Animation Events**/
-		public void OnAttackFrame()
+		public void OnAttackHit()
 		{
+			if (!IsHost) return;		// 피격 판정은 서버에서
 
+			Debug.Log("On Attack Hit!");
+		}
+
+		public void OnAttackEnd()
+		{
+			if (!IsOwner) return;
+			stateMachine.ChangeState(stateMachine.Idle);
 		}
 	}
 }

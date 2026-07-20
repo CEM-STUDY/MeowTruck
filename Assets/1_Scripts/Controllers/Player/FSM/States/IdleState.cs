@@ -22,7 +22,7 @@ namespace MeowTruck.Controllers
 			base.OnUpdate();
 
 			if (CheckIsAbleToMove()) return;
-			// if (CheckIsAbleToAttack()) return;
+			if (CheckIsAbleToUse()) return;
 		}
 
 		public override void OnLateUpdate()

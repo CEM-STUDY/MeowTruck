@@ -27,7 +27,6 @@ namespace MeowTruck.Controllers
 		public void ChangeState(StateBase newState)
 		{
 			CurState.Exit();
-			Debug.Log("CHANGE TO : " + newState.ToString());
 			CurState = newState;
 			CurState.Enter();
 		}

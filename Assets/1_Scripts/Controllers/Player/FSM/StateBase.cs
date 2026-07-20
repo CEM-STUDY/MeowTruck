@@ -1,5 +1,6 @@
 using MeowTruck.Manager;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace MeowTruck.Controllers
 {
@@ -36,18 +37,19 @@ namespace MeowTruck.Controllers
 			stateMachine.ChangeState(stateMachine.Move);
 			return true;
 		}
-		protected bool CheckIsAbleToAttack()
-		{
-			if (!Managers.Input.Control.Player.Attack.WasPressedThisFrame()) return false;
-
-			stateMachine.ChangeState(stateMachine.Attack);
-			return true;
-		}
 		protected bool CheckIsAbleToDash()
 		{
 			if (!Managers.Input.Control.Player.Dash.WasPressedThisFrame()) return false;
 
 			stateMachine.ChangeState(stateMachine.Dash);
+			return true;
+		}
+		protected bool CheckIsAbleToUse()
+		{
+			if (EventSystem.current.IsPointerOverGameObject()) return false;
+			if (!Managers.Input.Control.Player.Use.WasPressedThisFrame()) return false;
+
+			controller.UseCurrentItem();
 			return true;
 		}
 	}

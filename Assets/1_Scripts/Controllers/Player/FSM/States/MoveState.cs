@@ -22,9 +22,8 @@ namespace MeowTruck.Controllers
 		{
 			base.OnUpdate();
 
-			Debug.Log("MOVE");
 			if (CheckIsAbleToIdle()) return;
-			// if (CheckIsAbleToAttack()) return;
+			if (CheckIsAbleToUse()) return;
 			if (CheckIsAbleToDash()) return;
 
 			Vector2 dir = Managers.Input.Control.Player.Move.ReadValue<Vector2>();
@@ -34,7 +33,6 @@ namespace MeowTruck.Controllers
 		public override void OnLateUpdate()
 		{
 			base.OnLateUpdate();
-
 		}
 
 		public override void OnPhysicsUpdate()

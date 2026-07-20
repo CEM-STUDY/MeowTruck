@@ -8,6 +8,7 @@ namespace MeowTruck.Controllers
 		public override void Enter()
 		{
 			base.Enter();
+			controller.SetAnimatorParam(AnimParamType.Attack);
 		}
 
 		public override void Exit()

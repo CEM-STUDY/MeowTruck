@@ -25,5 +25,8 @@ namespace MeowTruck
 		/** Key-Value **/
 		public static readonly string KEY_GAMENAME = "GameName";
 		public static readonly string VALUE_GAMENAME = "MeowTruck";
+
+		/** Anim Params **/
+		public static readonly string ANIM_PARAM_ATTACK = "isAttack";
 	}
 }

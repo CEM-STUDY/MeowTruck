@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: 02_ItemData
   m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Data.ItemData
   itemID: 2
+  isConsumable: 0
   maxStack: 99
   itemSprite: {fileID: 21300000, guid: d1482390af62d644cb180afa38adaf8e, type: 3}
+  useBehaviour: {fileID: 11400000, guid: f6b5adef336b6ad4593210ce6107febb, type: 2}

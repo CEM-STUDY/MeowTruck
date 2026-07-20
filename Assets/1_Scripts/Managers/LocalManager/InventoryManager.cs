@@ -1,6 +1,8 @@
+using MeowTruck.Controllers;
 using MeowTruck.Data;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MeowTruck.Manager
@@ -94,11 +96,21 @@ namespace MeowTruck.Manager
 		// count가 -1이면 전부 삭제
 		public void RemoveItem(int slotId, int count = -1)
 		{
-			if (slotId >= items.Count)
+			if (slotId >= items.Count || items[slotId] == null || items[slotId].Item == null)
 			{
 				Debug.LogWarning("[InventoryManager] - wrong slotID");
 				return;
 			}
+
+			if (items[slotId].Count < count)
+			{
+				Debug.LogWarning("[InventoryManager] - wrong item count");
+				return;
+			}
+
+			items[slotId].Count -= count;
+			if (items[slotId].Count == 0) items[slotId].Item = null;
+
 			OnSlotChanged?.Invoke(slotId, items[slotId]);
 		}
 		public void ChangeSlot(int slotId1, int slotId2)
@@ -117,6 +129,16 @@ namespace MeowTruck.Manager
 		{
 			OnSlotSelected?.Invoke(currentSlotId, slotId);
 			currentSlotId = slotId;
+		}
+		public void UseCurrentSelectedItem(PlayerController controller)
+		{
+			if (!TryGetItemData(currentSlotId, out var itemData)) return;
+			if (itemData.UseBehaviour == null) return;
+
+			if(itemData.UseBehaviour.Use(controller, itemData))
+			{
+				if (itemData.IsConsumable) RemoveItem(currentSlotId, 1);
+			}
 		}
 
 		private bool TryGetSlotId(int itemId, out int slotId)

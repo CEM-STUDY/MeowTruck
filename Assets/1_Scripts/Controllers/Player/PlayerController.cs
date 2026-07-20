@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
+using MeowTruck.Data;
 using MeowTruck.Manager;
 using System;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -31,12 +33,13 @@ namespace MeowTruck.Controllers
 		[SerializeField] private float itemDetectRange;
 		[Space(20)]
 
-
+		private List<int> animIds = new();
 		private PlayerController instance = null;
 		private PlayerStateMachine stateMachine = null;
 
 		/** Components **/
-		private new Rigidbody2D rigidBody;
+		private Rigidbody2D rigidBody;
+		private Animator animator;
 
 		private bool isDashing = false;
 		public bool IsDashing => isDashing;
@@ -58,6 +61,9 @@ namespace MeowTruck.Controllers
 			}
 
 			rigidBody = GetComponent<Rigidbody2D>();
+			animator = GetComponent<Animator>();
+
+			animIds.Add(Animator.StringToHash(Constants.ANIM_PARAM_ATTACK));
 		}
 
 		private void Start()
@@ -120,7 +126,17 @@ namespace MeowTruck.Controllers
 
 			isDashing = false;
 		}
+		public void Attack(ItemData itemData)
+		{
+			// Called from ItemUseBehaviour
+			// TODO - 방향 고려 필요
+			stateMachine.ChangeState(stateMachine.Attack);
+		}
 
+		public void UseCurrentItem()
+		{
+			Managers.Inventory.UseCurrentSelectedItem(this);
+		}
 		private void RecordPrevDir()
 		{
 			Vector2 dir = Managers.Input.Control.Player.Move.ReadValue<Vector2>();
@@ -128,5 +144,8 @@ namespace MeowTruck.Controllers
 
 			prevDir = dir;
 		}
+
+		public void SetAnimatorParam(AnimParamType type) => animator.SetTrigger(animIds[(int)type]);
+		public void SetAnimatorParam(AnimParamType type, bool isOn) => animator.SetBool(animIds[(int)type], isOn);
 	}
 }
