@@ -16,6 +16,7 @@ namespace MeowTruck.Controllers
 		public override void Exit()
 		{
 			base.Exit();
+			controller.ResetVelocity();
 		}
 
 		public override void OnUpdate()

@@ -118,6 +118,10 @@ namespace MeowTruck.Controllers
 		{
 			rigidBody.linearVelocity = dir * moveSpeed;
 		}
+		public void ResetVelocity()
+		{
+			rigidBody.linearVelocity = Vector2.zero;
+		}
 		public async UniTask Dash(Vector2 dir)
 		{
 			if (isDashing) return;
