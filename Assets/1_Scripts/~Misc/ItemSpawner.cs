@@ -28,7 +28,7 @@ namespace MeowTruck.Misc
 		{
 			base.OnNetworkSpawn();
 
-			Managers.Inventory.OnDropItem += SpawnItem;
+			Managers.Inventory.OnDropItem += SpawnItemServerRPC;
 		}
 
 		private void Update()
@@ -41,7 +41,8 @@ namespace MeowTruck.Misc
 			}
 		}
 
-		public void SpawnItem(Vector3 position, int itemId, int count)
+		[Rpc(SendTo.Server)]
+		public void SpawnItemServerRPC(Vector3 position, int itemId, int count)
 		{
 			var obj = Instantiate(itemPrefab, position, Quaternion.identity);
 			obj.GetComponent<NetworkObject>().Spawn();
