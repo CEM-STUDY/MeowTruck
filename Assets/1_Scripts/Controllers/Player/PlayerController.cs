@@ -43,7 +43,7 @@ namespace MeowTruck.Controllers
 
 		private Vector2 prevDir = Vector2.right;
 
-		private NetworkVariable<int> selectedItemId = new(-1);
+		private NetworkVariable<int> selectedItemId = new(-1, writePerm: NetworkVariableWritePermission.Owner);
 
 		private void Awake()
 		{
