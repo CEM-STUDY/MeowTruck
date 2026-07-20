@@ -2,17 +2,35 @@ using Cysharp.Threading.Tasks;
 using MeowTruck.Manager;
 using System;
 using Unity.Netcode;
-using UnityEditor.Analytics;
 using UnityEngine;
 
 namespace MeowTruck.Controllers
 {
+	/// <summary>
+	/// 
+	/// Player의 기본적인 동작 관련 스크립트
+	/// 
+	/// </summary>
 	public partial class PlayerController : NetworkBehaviour
     {
 		[Header("Movement Params")]
 		[SerializeField] private float moveSpeed;
 		[SerializeField] private float dashSpeed;
 		[SerializeField] private float dashDuration;
+		[Space(20)]
+
+		[Header("Bindings")]
+		[SerializeField] private SpriteRenderer itemSprite;
+
+		[Header("Interacts")]
+		[SerializeField] private LayerMask interactLayer;
+		[SerializeField] private float interactDistance;
+
+		[SerializeField] private LayerMask itemLayer;
+		[SerializeField] private Vector2 itemDetectOffset;
+		[SerializeField] private float itemDetectRange;
+		[Space(20)]
+
 
 		private PlayerController instance = null;
 		private PlayerStateMachine stateMachine = null;
@@ -24,6 +42,8 @@ namespace MeowTruck.Controllers
 		public bool IsDashing => isDashing;
 
 		private Vector2 prevDir = Vector2.right;
+
+		private NetworkVariable<int> selectedItemId = new(-1);
 
 		private void Awake()
 		{
@@ -42,7 +62,22 @@ namespace MeowTruck.Controllers
 
 		private void Start()
 		{
+			if (!IsOwner) return;
+
 			stateMachine = new(this);
+
+			Managers.Inventory.OnSlotSelected += ((_, cur) => { OnSlotSelected(cur); });
+		}
+
+		public override void OnNetworkSpawn()
+		{
+			base.OnNetworkSpawn();
+			
+			selectedItemId.OnValueChanged += ((_, itemId) =>
+			{
+				OnItemSelected(itemId);
+			});
+			OnItemSelected(selectedItemId.Value);
 		}
 
 		private void Update()

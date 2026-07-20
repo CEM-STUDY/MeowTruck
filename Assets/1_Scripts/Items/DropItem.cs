@@ -42,7 +42,7 @@ namespace MeowTruck.Items
 		public void TryGetItem()
 		{
 			if (itemCount.Value == 0) return;   // Init 안됨
-			Debug.Log("TryGetItem");
+
 			if (Managers.Inventory.IsAbleToAdd(itemData.ItemID, itemCount.Value))
 				TryGetItemServerRPC(NetworkManager.LocalClientId);
 		}
@@ -50,7 +50,6 @@ namespace MeowTruck.Items
 		[Rpc(SendTo.Server)]
 		private void TryGetItemServerRPC(ulong clientID)
 		{
-			Debug.Log("TryGetItemServerRPC");
 			if (isOwned) return;
 			isOwned = true;
 
@@ -68,7 +67,6 @@ namespace MeowTruck.Items
 		[Rpc(SendTo.SpecifiedInParams)]
 		private void GetItemClientRPC(int id, int count, RpcParams rpcParmas = default)
 		{
-			Debug.Log("CLINET RPC");
 			Managers.Inventory.AddItem(id, count);
 		}
 	}

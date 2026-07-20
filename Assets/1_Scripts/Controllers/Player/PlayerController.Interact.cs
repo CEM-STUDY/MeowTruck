@@ -5,15 +5,13 @@ using UnityEngine;
 
 namespace MeowTruck.Controllers
 {
+	/// <summary>
+	/// 
+	/// Player의 상호작용 관련 스크립트
+	/// 
+	/// </summary>
 	public partial class PlayerController
 	{
-		[Header("Interacts")]
-		[SerializeField] private LayerMask interactLayer;
-		[SerializeField] private float interactDistance;
-
-		[SerializeField] private LayerMask itemLayer;
-		[SerializeField] private Vector2 itemDetectOffset;
-		[SerializeField] private float itemDetectRange;
 
 		public InteractableBase CurrentInteractable { get; private set; } = null;
 

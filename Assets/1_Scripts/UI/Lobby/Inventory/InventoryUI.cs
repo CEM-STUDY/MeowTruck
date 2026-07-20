@@ -2,6 +2,7 @@ using MeowTruck.Manager;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MeowTruck.UI
 {
@@ -12,10 +13,20 @@ namespace MeowTruck.UI
 		private void Awake()
 		{
 			slots = GetComponentsInChildren<ItemSlot>().ToList();
+
+			for (int i = 0; i < slots.Count; i++)
+			{
+				int t = i;
+				slots[i].GetComponent<Button>().onClick.AddListener(() =>
+				{
+					Managers.Inventory.SelectSlot(t);
+				});
+			}
 		}
 
 		private void Start()
 		{
+			Managers.Inventory.OnSlotSelected += OnSlotSelected;
 			Managers.Inventory.OnSlotChanged += OnSlotChanged;
 			Managers.Inventory.OnInventoryUpdated += OnInventoryUpdated;
 
@@ -32,10 +43,26 @@ namespace MeowTruck.UI
 
 		private void OnSlotChanged(int slotId, ItemStack stack)
 		{
-			Debug.Log("ON SLOT CHANGED : " + slotId);
 			if (slots.Count <= slotId) return;
 			slots[slotId].SetSprite(stack.Item != null ? stack.Item.ItemSprite : null);
 			slots[slotId].SetCountText(stack.Count);
+		}
+
+		private void OnSlotSelected(int prev, int cur)
+		{
+			if (prev >= slots.Count || cur >= slots.Count)
+			{
+				Debug.LogWarning("[InventoryUI] - wrong slotId");
+				return;
+			}
+			if (prev == cur) return;
+
+			if (prev == -1)
+				for (int i = 0; i < slots.Count; i++) slots[i].OnUnselected();
+			else
+				slots[prev].OnUnselected();
+
+			slots[cur].OnSelected();
 		}
 	}
 }

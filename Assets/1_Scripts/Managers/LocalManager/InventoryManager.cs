@@ -15,8 +15,11 @@ namespace MeowTruck.Manager
 	{
 		private List<ItemStack> items { get; } = new();
 
+		public Action<int, int> OnSlotSelected { get; set; }
 		public Action<int, ItemStack> OnSlotChanged{ get; set; }
 		public Action<List<ItemStack>> OnInventoryUpdated { get; set; }
+
+		public int currentSlotId = 0;
 
 		public void Init(int count)
 		{
@@ -28,6 +31,27 @@ namespace MeowTruck.Manager
 					Count = 0
 				});
 			};
+
+			// TODO - LOAD INVENTORY
+			OnSlotChanged += ((sId, _) =>
+			{
+				if (sId == currentSlotId) SelectSlot(currentSlotId);
+			});
+		}
+
+		public void UpdateInventory()
+		{
+			OnSlotSelected.Invoke(-1, 0);
+			OnInventoryUpdated.Invoke(items);
+		}
+		public bool TryGetItemData(int slotId, out ItemData data)
+		{
+			data = null;
+			if (slotId < 0 || slotId >= items.Count) return false;
+			if (items[slotId] == null || items[slotId].Item == null) return false;
+
+			data = items[slotId].Item;
+			return true;
 		}
 
 		public bool IsAbleToAdd(int itemId, int count)
@@ -64,8 +88,7 @@ namespace MeowTruck.Manager
 				items[slotId].Count += count;
 			}
 
-			Debug.Log("ADD ITEM1");
-			OnSlotChanged.Invoke(slotId, items[slotId]);
+			OnSlotChanged?.Invoke(slotId, items[slotId]);
 		}
 
 		// count가 -1이면 전부 삭제
@@ -76,7 +99,7 @@ namespace MeowTruck.Manager
 				Debug.LogWarning("[InventoryManager] - wrong slotID");
 				return;
 			}
-			OnSlotChanged.Invoke(slotId, items[slotId]);
+			OnSlotChanged?.Invoke(slotId, items[slotId]);
 		}
 		public void ChangeSlot(int slotId1, int slotId2)
 		{
@@ -86,9 +109,15 @@ namespace MeowTruck.Manager
 				return;
 			}
 
-			OnSlotChanged.Invoke(slotId1, items[slotId1]);
-			OnSlotChanged.Invoke(slotId2, items[slotId2]);
-		}											   
+			OnSlotChanged?.Invoke(slotId1, items[slotId1]);
+			OnSlotChanged?.Invoke(slotId2, items[slotId2]);
+		}
+
+		public void SelectSlot(int slotId)
+		{
+			OnSlotSelected?.Invoke(currentSlotId, slotId);
+			currentSlotId = slotId;
+		}
 
 		private bool TryGetSlotId(int itemId, out int slotId)
 		{
@@ -119,11 +148,6 @@ namespace MeowTruck.Manager
 			}
 
 			return false;
-		}
-
-		public void UpdateInventory()
-		{
-			OnInventoryUpdated.Invoke(items);
 		}
 	}
 }

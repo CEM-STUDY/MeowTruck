@@ -10,8 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3435344232529482}
   - component: {fileID: 7564404576040011236}
-  - component: {fileID: 3277142044417499096}
-  - component: {fileID: 4966428091048950298}
+  - component: {fileID: 4409069223131359936}
   m_Layer: 0
   m_Name: NetworkDay
   m_TagString: Untagged
@@ -59,7 +58,7 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &3277142044417499096
+--- !u!114 &4409069223131359936
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -68,14 +67,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4870758944814009090}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2269add9306caa4b85d63d839a2dc98, type: 3}
+  m_Script: {fileID: 11500000, guid: aa45ffedb264c0e4385876126f991465, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetworkDay
+  m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Environments.NetworkDay
   ShowTopMostFoldoutHeaderGroup: 1
-  cycleLengthSeconds: 20
-  villageSceneName: 3_VillageScene
-  foodTruckSceneName: 4_FoodTruckScene
-  fieldSceneName: 5_FieldScene
+  cycleLengthSeconds: 600
   CycleStartedAt:
     m_InternalValue: 0
   CyclePosition:
@@ -84,20 +80,3 @@ MonoBehaviour:
     m_InternalValue: 1
   IsRunning:
     m_InternalValue: 0
---- !u!114 &4966428091048950298
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4870758944814009090}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b95013b9c67046fea75bd622232cc16a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NetworkDayTestPanel
-  villageSceneName: 3_VillageScene
-  foodTruckSceneName: 4_FoodTruckScene
-  fieldSceneName: 5_FieldScene
-  toggleKey: 289
-  isVisible: 1
