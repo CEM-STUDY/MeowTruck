@@ -1,4 +1,5 @@
 using MeowTruck.Items;
+using MeowTruck.Manager;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,14 +10,42 @@ namespace MeowTruck.Misc
 	{
 		[SerializeField] private GameObject itemPrefab;
 
+		public static ItemSpawner Instance { get; private set; } = null;
+		private void Awake()
+		{
+			if (Instance == null)
+			{
+				Instance = this;
+				DontDestroyOnLoad(gameObject);
+			}
+			else
+			{
+				Destroy(gameObject);
+			}
+		}
+
+		public override void OnNetworkSpawn()
+		{
+			base.OnNetworkSpawn();
+
+			Managers.Inventory.OnDropItem += SpawnItem;
+		}
+
 		private void Update()
 		{
 			if (IsHost && Input.GetKeyDown(KeyCode.R))
 			{
 				var obj = Instantiate(itemPrefab);
 				obj.GetComponent<NetworkObject>().Spawn();
-				obj.GetComponent<DropItem>().InitDropItem(Random.Range(1, 4), Random.Range(2, 10));
+				obj.GetComponent<DropItem>().InitDropItem(Random.Range(1, 4), 60);
 			}
+		}
+
+		public void SpawnItem(Vector3 position, int itemId, int count)
+		{
+			var obj = Instantiate(itemPrefab, position, Quaternion.identity);
+			obj.GetComponent<NetworkObject>().Spawn();
+			obj.GetComponent<DropItem>().InitDropItem(itemId, count);
 		}
 	}
 }

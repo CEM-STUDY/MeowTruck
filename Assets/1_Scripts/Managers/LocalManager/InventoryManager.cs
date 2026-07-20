@@ -1,5 +1,8 @@
 using MeowTruck.Controllers;
 using MeowTruck.Data;
+using MeowTruck.Items;
+using MeowTruck.Misc;
+using Mono.Cecil;
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -18,8 +21,9 @@ namespace MeowTruck.Manager
 		private List<ItemStack> items { get; } = new();
 
 		public Action<int, int> OnSlotSelected { get; set; }
-		public Action<int, ItemStack> OnSlotChanged{ get; set; }
+		public Action<int, ItemStack> OnSlotChanged { get; set; }
 		public Action<List<ItemStack>> OnInventoryUpdated { get; set; }
+		public Action<Vector3, int, int> OnDropItem { get; set; }
 
 		public int currentSlotId = 0;
 
@@ -56,41 +60,91 @@ namespace MeowTruck.Manager
 			return true;
 		}
 
-		public bool IsAbleToAdd(int itemId, int count)
+		public bool IsAbleToAdd(int itemId, int count, out int getCount)
 		{
-			if (!TryGetSlotId(itemId, out int slotId))
-			{
-				if(!TryGetEmptySlotId(out slotId))
-				{
-					return false;
-				}
+			ItemData item = Managers.Resource.GetItemData(itemId);
 
-				return true;
+			int remain = count;
+
+			// 기존 스택 채우기
+			for (int i = 0; i < items.Count && remain > 0; i++)
+			{
+				if (items[i].Item == null)
+					continue;
+
+				if (items[i].Item.ItemID != itemId)
+					continue;
+
+				int space = item.MaxStack - items[i].Count;
+				int add = Mathf.Min(space, remain);
+
+				remain -= add;
 			}
 
-			return items[slotId].Item.MaxStack >= items[slotId].Count + count;
+			// 빈 슬롯 사용
+			for (int i = 0; i < items.Count && remain > 0; i++)
+			{
+				if (items[i].Item != null)
+					continue;
+
+				int add = Mathf.Min(item.MaxStack, remain);
+
+				remain -= add;
+			}
+
+			getCount = count - remain;
+			return remain != count;
 		}
-		public void AddItem(int itemId, int count = 1)
+		public bool AddItem(int itemId, int count, out int getCount)
 		{
-			if (!TryGetSlotId(itemId, out int slotId))
-			{
-				if (!TryGetEmptySlotId(out slotId))
-				{
-					return;
-				}
+			if (!IsAbleToAdd(itemId, count, out getCount))
+				return false;
 
-				items[slotId] = new ItemStack
+			ItemData item = Managers.Resource.GetItemData(itemId);
+			int remain = count;
+
+			// 기존 스택부터 채우기
+			for (int i = 0; i < items.Count && remain > 0; i++)
+			{
+				if (items[i].Item == null)
+					continue;
+
+				if (items[i].Item.ItemID != itemId)
+					continue;
+
+				int space = item.MaxStack - items[i].Count;
+
+				if (space <= 0)
+					continue;
+
+				int add = Mathf.Min(space, remain);
+
+				items[i].Count += add;
+				remain -= add;
+
+				OnSlotChanged?.Invoke(i, items[i]);
+			}
+
+			// 빈 슬롯에 새 스택 생성
+			for (int i = 0; i < items.Count && remain > 0; i++)
+			{
+				if (items[i].Item != null)
+					continue;
+
+				int add = Mathf.Min(item.MaxStack, remain);
+
+				items[i] = new ItemStack
 				{
-					Item = Managers.Resource.GetItemData(itemId),
-					Count = count
+					Item = item,
+					Count = add
 				};
-			}
-			else
-			{
-				items[slotId].Count += count;
+
+				remain -= add;
+
+				OnSlotChanged?.Invoke(i, items[i]);
 			}
 
-			OnSlotChanged?.Invoke(slotId, items[slotId]);
+			return true;
 		}
 
 		// count가 -1이면 전부 삭제
@@ -108,6 +162,7 @@ namespace MeowTruck.Manager
 				return;
 			}
 
+			if (count == -1) count = items[slotId].Count;
 			items[slotId].Count -= count;
 			if (items[slotId].Count == 0) items[slotId].Item = null;
 
@@ -120,9 +175,29 @@ namespace MeowTruck.Manager
 				Debug.LogWarning("[InventoryManager] - wrong slotID");
 				return;
 			}
+			if (slotId1 == slotId2) return;
+
+			(items[slotId1], items[slotId2]) = (items[slotId2], items[slotId1]);
 
 			OnSlotChanged?.Invoke(slotId1, items[slotId1]);
 			OnSlotChanged?.Invoke(slotId2, items[slotId2]);
+		}
+		public void DropItem(Vector3 position, int slotId, int count = -1)
+		{
+			if (slotId < 0 || slotId >= items.Count)
+			{
+				Debug.LogWarning("[InventoryManager] - Wrong slotid");
+				return;
+			}
+
+			if(items[slotId] == null || items[slotId].Item == null)
+			{
+				return;
+			}
+
+			if (count == -1) count = items[slotId].Count;
+			OnDropItem.Invoke(position, items[slotId].Item.ItemID, count);
+			RemoveItem(slotId);
 		}
 
 		public void SelectSlot(int slotId)
@@ -135,7 +210,7 @@ namespace MeowTruck.Manager
 			if (!TryGetItemData(currentSlotId, out var itemData)) return;
 			if (itemData.UseBehaviour == null) return;
 
-			if(itemData.UseBehaviour.Use(controller, itemData))
+			if (itemData.UseBehaviour.Use(controller, itemData))
 			{
 				if (itemData.IsConsumable) RemoveItem(currentSlotId, 1);
 			}

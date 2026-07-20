@@ -97,7 +97,6 @@ namespace MeowTruck.Controllers
 			stateMachine.CurState.OnUpdate();
 		}
 
-
 		private void LateUpdate()
 		{
 			if (!IsOwner) return;

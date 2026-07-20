@@ -1,6 +1,4 @@
-using Mono.Cecil;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace MeowTruck.Manager
 {
@@ -28,7 +26,7 @@ namespace MeowTruck.Manager
 
 			Input.Init();
 			Resource.Init();
-			Inventory.Init(10);
+			Inventory.Init(8);	// HACK
 		}
 
 		public static SceneManagerEx Scene { get; private set; } = new SceneManagerEx();

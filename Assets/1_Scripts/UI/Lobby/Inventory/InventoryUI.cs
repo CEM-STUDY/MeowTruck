@@ -21,6 +21,7 @@ namespace MeowTruck.UI
 				{
 					Managers.Inventory.SelectSlot(t);
 				});
+				slots[i].GetComponent<ItemSlot>().Init(t);
 			}
 		}
 

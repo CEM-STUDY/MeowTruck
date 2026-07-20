@@ -10,7 +10,8 @@ namespace MeowTruck.Items
 		private ItemData itemData;
 		private NetworkVariable<int> itemId = new(-1);
 		private NetworkVariable<int> itemCount = new(0);
-		private bool isOwned = false;
+
+		private bool isOwned = true;
 
 		public override void OnNetworkSpawn()
 		{
@@ -26,9 +27,9 @@ namespace MeowTruck.Items
 
 		public void InitDropItem(int id, int count)
 		{
-			// TODO - Set Sprite
 			itemId.Value = id;
 			itemCount.Value = count;
+			isOwned = false;
 		}
 
 		private void ApplyItem(int cur)
@@ -43,7 +44,7 @@ namespace MeowTruck.Items
 		{
 			if (itemCount.Value == 0) return;   // Init 안됨
 
-			if (Managers.Inventory.IsAbleToAdd(itemData.ItemID, itemCount.Value))
+			if (Managers.Inventory.IsAbleToAdd(itemData.ItemID, itemCount.Value, out int count))
 				TryGetItemServerRPC(NetworkManager.LocalClientId);
 		}
 
@@ -61,13 +62,22 @@ namespace MeowTruck.Items
 						Target = RpcTarget.Single(clientID, RpcTargetUse.Temp)
 					}
 				});
-			GetComponent<NetworkObject>().Despawn(true);
 		}
 
 		[Rpc(SendTo.SpecifiedInParams)]
 		private void GetItemClientRPC(int id, int count, RpcParams rpcParmas = default)
 		{
-			Managers.Inventory.AddItem(id, count);
+			Managers.Inventory.AddItem(id, count, out int getCount);
+			SendResultServerRPC(getCount);
+		}
+
+		[Rpc(SendTo.Server)]
+		private void SendResultServerRPC(int count)
+		{
+			itemCount.Value -= count;
+			isOwned = false;
+			if (itemCount.Value == 0)
+				GetComponent<NetworkObject>().Despawn(true);
 		}
 	}
 }
