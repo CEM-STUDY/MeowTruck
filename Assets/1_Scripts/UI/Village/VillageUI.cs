@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using MeowTruck.Environments;
 
 namespace MeowTruck.UI
 {
@@ -11,18 +12,34 @@ namespace MeowTruck.UI
         private void Awake()
         {
             mapButton.onClick.AddListener(OpenMapPanel);
+            MeetingPoint.TravelMapOpened += OpenTravelMapPanel;
+            MeetingPoint.TravelMapClosed += CloseTravelMapPanel;
 
             mapPanel.gameObject.SetActive(false);
         }
 
         private void OpenMapPanel()
         {
+            mapPanel.SetTravelMode(false);
             mapPanel.gameObject.SetActive(true);
+        }
+
+        private void OpenTravelMapPanel()
+        {
+            mapPanel.SetTravelMode(true);
+            mapPanel.gameObject.SetActive(true);
+        }
+
+        private void CloseTravelMapPanel()
+        {
+            mapPanel.gameObject.SetActive(false);
         }
 
         private void OnDestroy()
         {
             mapButton.onClick.RemoveListener(OpenMapPanel);
+            MeetingPoint.TravelMapOpened -= OpenTravelMapPanel;
+            MeetingPoint.TravelMapClosed -= CloseTravelMapPanel;
         }
     }
 }

@@ -1,12 +1,18 @@
 using MeowTruck.Manager;
+using System;
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MeowTruck.Environments
 {
 	public class MeetingPoint : NetworkBehaviour
 	{
+		public static event Action TravelMapOpened;
+		public static event Action TravelMapClosed;
+
 		[SerializeField] private Vector2 boxCenter;
 		[SerializeField] private Vector2 boxSize;
 		[SerializeField] private float maxTime = 5f;
@@ -22,6 +28,8 @@ namespace MeowTruck.Environments
 
 		private Collider2D[] hits = new Collider2D[Constants.MAX_PLAYERS];
 		private ContactFilter2D filter = new ContactFilter2D();
+		private readonly HashSet<ulong> detectedClients = new();
+		private bool meetingCompleted;
 
 		private void Awake()
 		{
@@ -54,6 +62,29 @@ namespace MeowTruck.Environments
 			gameObject.SetActive(false);
 		}
 
+		public static void RequestCloseTravelMap()
+		{
+			MeetingPoint meetingPoint = FindFirstObjectByType<MeetingPoint>();
+			if (meetingPoint != null && meetingPoint.IsHost)
+			{
+				meetingPoint.meetingCompleted = false;
+				meetingPoint.elapsedTime.Value = 0f;
+				meetingPoint.CloseTravelMapClientRpc();
+			}
+		}
+
+		[ClientRpc]
+		private void OpenTravelMapClientRpc()
+		{
+			TravelMapOpened?.Invoke();
+		}
+
+		[ClientRpc]
+		private void CloseTravelMapClientRpc()
+		{
+			TravelMapClosed?.Invoke();
+		}
+
 		private int playerCount = 0;
 		private bool isLocalPlayerDetected = false;
 
@@ -75,19 +106,33 @@ namespace MeowTruck.Environments
 
 			if (!IsHost) return;
 
-			isMeeting = (playerCount == Unity.Netcode.NetworkManager.Singleton.ConnectedClients.Count);
+			detectedClients.Clear();
+			for (int i = 0; i < playerCount; i++)
+			{
+				NetworkObject networkObject = hits[i].GetComponentInParent<NetworkObject>();
+				if (networkObject != null && networkObject.IsPlayerObject)
+					detectedClients.Add(networkObject.OwnerClientId);
+			}
+
+			isMeeting = detectedClients.Count == NetworkManager.Singleton.ConnectedClients.Count;
 			if (isMeeting)
 			{
-				elapsedTime.Value += Time.deltaTime;
-				if (elapsedTime.Value > maxTime)
+				if (meetingCompleted) return;
+
+				elapsedTime.Value = Mathf.Min(elapsedTime.Value + Time.deltaTime, maxTime);
+				if (elapsedTime.Value >= maxTime)
 				{
 					// TODO - 게이지 다 차면 할 일 작성
-					Managers.Scene.ChangeScene(Constants.SCENE_VILLAGE);
+					meetingCompleted = true;
+					if (SceneManager.GetActiveScene().name == Constants.SCENE_VILLAGE)
+						OpenTravelMapClientRpc();
+					else
+						Managers.Scene.ChangeScene(Constants.SCENE_VILLAGE);
 				}
 			}
 			else
 			{
-				if (elapsedTime.Value > 0f) elapsedTime.Value = 0;
+				if (!meetingCompleted && elapsedTime.Value > 0f) elapsedTime.Value = 0f;
 			}
 		}
 

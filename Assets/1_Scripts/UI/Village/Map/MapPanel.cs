@@ -1,4 +1,5 @@
 using MeowTruck.Manager;
+using MeowTruck.Environments;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -17,6 +18,14 @@ namespace MeowTruck.UI
         private Button[] cityButtons;
         private Button[] fieldButtons;
         private string pendingSceneName;
+        private bool isTravelMode;
+
+        public void SetTravelMode(bool enabled)
+        {
+            isTravelMode = enabled;
+            pendingSceneName = null;
+            confirmPopup.gameObject.SetActive(false);
+        }
 
         private void Awake()
         {
@@ -27,7 +36,7 @@ namespace MeowTruck.UI
 
         private void OpenConfirmPopup(bool isCity, int idx)
         {
-            if (!NetworkManager.Singleton.IsServer) return;
+            if (!isTravelMode || NetworkManager.Singleton == null || !NetworkManager.Singleton.IsHost) return;
 
             string text = isCity ?
                 "Are you sure enter the city?" :
@@ -56,6 +65,14 @@ namespace MeowTruck.UI
 
         private void ClosePanel()
         {
+            if (isTravelMode)
+            {
+                if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsHost) return;
+
+                MeetingPoint.RequestCloseTravelMap();
+                return;
+            }
+
             gameObject.SetActive(false);
         }
 
