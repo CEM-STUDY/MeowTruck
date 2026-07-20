@@ -5,6 +5,10 @@ namespace MeowTruck.Data
 {
 	public abstract class AttackBehaviour : ItemUseBehaviour
 	{
+		[SerializeField] private int maxCombo;
+
+		public int MaxCombo => maxCombo;
+
 		public override bool Use(PlayerController controller, ItemData data)
 		{
 			controller.Attack();

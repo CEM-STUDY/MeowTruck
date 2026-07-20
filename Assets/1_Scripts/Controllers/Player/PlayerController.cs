@@ -132,11 +132,6 @@ namespace MeowTruck.Controllers
 
 			isDashing = false;
 		}
-		public void Attack()
-		{
-			// Called from ItemUseBehaviour
-			stateMachine.ChangeState(stateMachine.Attack);
-		}
 
 		public void UseCurrentItem()
 		{
@@ -149,16 +144,6 @@ namespace MeowTruck.Controllers
 			worldPos.z = 0f;
 
 			currentDir = (worldPos - transform.position).ToVec2().normalized;
-		}
-
-		[Rpc(SendTo.Server)]
-		public void AttackServerRPC(Vector2 direction)
-		{
-			ItemData itemData = Managers.Resource.GetItemData(selectedItemId.Value);
-			if (itemData.UseBehaviour is AttackBehaviour attackBehaviour)
-			{
-				attackBehaviour.Attack(this, direction, attackTargetLayer);
-			}
 		}
 
 		public void SetAnimatorParam(AnimParamType type) => animator.SetTrigger(animIds[(int)type]);

@@ -1,10 +1,6 @@
 using MeowTruck.Data;
-using MeowTruck.Interactables;
-using MeowTruck.Items;
 using MeowTruck.Manager;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 namespace MeowTruck.Controllers
 {

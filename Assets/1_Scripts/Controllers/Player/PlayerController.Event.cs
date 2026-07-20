@@ -32,18 +32,5 @@ namespace MeowTruck.Controllers
 			itemSprite.sprite = Managers.Resource.GetItemData(itemID).ItemSprite;
 		}
 
-		/** Animation Events**/
-		public void OnAttackHit()
-		{
-			if (!IsOwner) return;
-
-			AttackServerRPC(currentDir);
-		}
-
-		public void OnAttackEnd()
-		{
-			if (!IsOwner) return;
-			stateMachine.ChangeState(stateMachine.Idle);
-		}
 	}
 }

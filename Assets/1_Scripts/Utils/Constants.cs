@@ -29,5 +29,6 @@ namespace MeowTruck
 
 		/** Anim Params **/
 		public static readonly string ANIM_PARAM_ATTACK = "isAttack";
+		public static readonly string ANIM_PARAM_COMBO = "AttackCombo";
 	}
 }
