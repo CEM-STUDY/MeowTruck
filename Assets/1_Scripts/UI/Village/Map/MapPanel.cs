@@ -7,7 +7,12 @@ using UnityEngine.UI;
 
 namespace MeowTruck.UI
 {
-    public class MapPanel : MonoBehaviour
+    public interface IMenuHoverHandler
+    {
+        void RequestFavoriteMenuHover(int cityIndex, bool active);
+    }
+
+    public class MapPanel : MonoBehaviour, IMenuHoverHandler
     {
         [SerializeField] private Button closeButton;
         [SerializeField] private GameObject cities;
@@ -15,10 +20,21 @@ namespace MeowTruck.UI
         [SerializeField] private GameObject favoriteMenuPrefab;
         [SerializeField] private ConfirmPopup confirmPopup;
 
+        [SerializeField] private MapPanelNetworkSync networkSync;
+
         private Button[] cityButtons;
         private Button[] fieldButtons;
+        private FavoriteMenuHover[] cityHovers;
         private string pendingSceneName;
         private bool isTravelMode;
+
+
+        private void Awake()
+        {
+            AddEvents();
+
+            confirmPopup.gameObject.SetActive(false);
+        }
 
         public void SetTravelMode(bool enabled)
         {
@@ -27,11 +43,20 @@ namespace MeowTruck.UI
             confirmPopup.gameObject.SetActive(false);
         }
 
-        private void Awake()
+        public void RequestFavoriteMenuHover(int cityIndex, bool active)
         {
-            AddEvents();
+            if (networkSync == null)
+                return;
 
-            confirmPopup.gameObject.SetActive(false);
+            networkSync.RequestFavoriteMenuHover(cityIndex, active);
+        }
+
+        private void OnMenuHoverChanged(int cityIndex, bool active)
+        {
+            if (cityHovers == null || cityIndex < 0 || cityIndex >= cityHovers.Length)
+                return;
+
+            cityHovers[cityIndex].SetMenuActive(active);
         }
 
         private void OpenConfirmPopup(bool isCity, int idx)
@@ -90,6 +115,7 @@ namespace MeowTruck.UI
             if (cities)
             {
                 cityButtons = cities.GetComponentsInChildren<Button>(true);
+                cityHovers = new FavoriteMenuHover[cityButtons.Length];
 
                 for (int i = 0; i < cityButtons.Length; i++)
                 {
@@ -101,7 +127,8 @@ namespace MeowTruck.UI
                         hover = cityButtons[i].gameObject.AddComponent<FavoriteMenuHover>();
                     }
 
-                    hover.Initialize(favoriteMenuPrefab);
+                    hover.Initialize(this, favoriteMenuPrefab, index);
+                    cityHovers[i] = hover;
                     cityButtons[i].onClick.AddListener(() => OpenConfirmPopup(true, index));
                 }
             }
@@ -118,31 +145,61 @@ namespace MeowTruck.UI
             }
 
             confirmPopup.SetEvents(ConfirmSceneChange);
+
+            if (networkSync != null)
+                networkSync.MenuHoverChanged += OnMenuHoverChanged;
         }
 
         private void DeleteEvents()
         {
             closeButton.onClick.RemoveListener(ClosePanel);
+
+            for (int i = 0; i < cityButtons.Length; i++)
+            {
+                if (cityButtons[i] != null)
+                    cityButtons[i].onClick.RemoveAllListeners();
+            }
+
+
+            for (int i = 0; i < fieldButtons.Length; i++)
+            {
+                fieldButtons[i].onClick.RemoveAllListeners();
+            }
+
+            if (networkSync != null)
+                networkSync.MenuHoverChanged -= OnMenuHoverChanged;
         }
         #endregion
     }
 
     public class FavoriteMenuHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        private IMenuHoverHandler hoverHandler;
         private GameObject favoriteMenuPrefab;
         private GameObject favoriteMenu;
+        private int cityIndex;
 
-        public void Initialize(GameObject prefab)
+        public void Initialize(IMenuHoverHandler handler, GameObject prefab, int index)
         {
+            hoverHandler = handler;
             favoriteMenuPrefab = prefab;
+            cityIndex = index;
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            hoverHandler?.RequestFavoriteMenuHover(cityIndex, true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            hoverHandler?.RequestFavoriteMenuHover(cityIndex, false);
+        }
+
+        public void SetMenuActive(bool active)
+        {
             if (!favoriteMenuPrefab)
-            {
                 return;
-            }
 
             if (!favoriteMenu)
             {
@@ -150,15 +207,7 @@ namespace MeowTruck.UI
                 favoriteMenu.transform.localPosition = Vector2.up * 130;
             }
 
-            favoriteMenu.SetActive(true);
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            if (favoriteMenu)
-            {
-                favoriteMenu.SetActive(false);
-            }
+            favoriteMenu.SetActive(active);
         }
     }
 }
