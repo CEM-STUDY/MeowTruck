@@ -14,6 +14,8 @@ namespace MeowTruck
 
 		private float traveledDistance = 0f;
 
+		private new Rigidbody2D rigidbody = null;
+
 		public void Init(Vector2 dir, float distance, float speed, 
 			LayerMask targetMask,
 			float damage)
@@ -25,15 +27,16 @@ namespace MeowTruck
 			this.targetMask = targetMask;
 			this.damage = damage;
 			this.speed = speed;
+
+			rigidbody = GetComponent<Rigidbody2D>();
 		}
 
 
-		private void Update()
+		private void FixedUpdate()
 		{
-			float moveDistance = speed * Time.deltaTime;
+			float moveDistance = speed * Time.fixedDeltaTime;
 
-			transform.position += (Vector3)dir * moveDistance;
-
+			rigidbody.MovePosition(rigidbody.position + dir * moveDistance);
 			traveledDistance += moveDistance;
 
 			if (traveledDistance >= distance)
