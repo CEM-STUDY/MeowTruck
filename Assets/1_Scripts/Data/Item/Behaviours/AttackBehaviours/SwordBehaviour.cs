@@ -1,6 +1,5 @@
 using MeowTruck.Controllers;
 using MeowTruck.Entities;
-using System.Linq;
 using UnityEngine;
 
 namespace MeowTruck.Data
@@ -15,10 +14,10 @@ namespace MeowTruck.Data
 		public float Distance => distance;
 		public Vector2 BoxSize => boxSize;
 
-		public override bool Attack(PlayerController controller, Vector2 dir, LayerMask targetLayer)
+		public override void Attack(PlayerController controller, Vector2 dir, LayerMask targetLayer)
 		{
 			if (dir == Vector2.zero)
-				return false;
+				return;
 
 			dir.Normalize();
 
@@ -42,7 +41,7 @@ namespace MeowTruck.Data
 				}
 			}
 
-			return hit;
+			return;
 		}
 
 	}

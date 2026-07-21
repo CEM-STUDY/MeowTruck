@@ -13,7 +13,6 @@ namespace MeowTruck.Controllers
 	public partial class PlayerController
 	{
 		private bool isEnableToCombo = false;
-		private bool isComboQueued = false;
 		private int comboIndex = 0;
 
 		public int ComboIndex => comboIndex;
@@ -21,7 +20,12 @@ namespace MeowTruck.Controllers
 
 		public void Attack()
 		{
-			// Called from ItemUseBehaviour
+			// Called from ItemUseBehaviour			
+			
+			AttackBehaviour attackBehaviour = Managers.Resource.GetItemData(selectedItemId.Value)?.UseBehaviour as AttackBehaviour;
+			if (attackBehaviour == null) return;
+
+			SetAnimatorParam("WeaponIndex", attackBehaviour.WeaponIndex);
 			stateMachine.ChangeState(stateMachine.Attack);
 		}
 
@@ -40,31 +44,16 @@ namespace MeowTruck.Controllers
 			}
 		}
 
-		/** Animation Events**/
-		public void OnAttackHit()
+
+		private void ImmediateNextCombo()
 		{
-			if (!IsOwner) return;
-
-			isEnableToCombo = true;
-			AttackServerRPC(currentDir);
-		}
-
-		public void OnAttackEnd()
-		{
-			if (!IsOwner) return;
-
 			isEnableToCombo = false;
-			if (ConsumeCombo())
+			if (IsEnableCombo())
 			{
 				animator.SetInteger(Constants.ANIM_PARAM_COMBO, comboIndex);
 				animator.SetBool(Constants.ANIM_PARAM_ATTACK, true);
 
 				NextCombo();
-			}
-			else
-			{
-				ResetCombo();
-				stateMachine.ChangeState(stateMachine.Idle);
 			}
 		}
 
@@ -78,31 +67,43 @@ namespace MeowTruck.Controllers
 			}
 
 			if (!isEnableToCombo) return;
-			isComboQueued = true;
+			ImmediateNextCombo();
 		}
 
-		public bool ConsumeCombo()
+		public bool IsEnableCombo()
 		{
-			bool value = isComboQueued;
-			isComboQueued = false;
-
 			AttackBehaviour attackBehaviour = Managers.Resource.GetItemData(selectedItemId.Value)?.UseBehaviour as AttackBehaviour;
 			if (attackBehaviour == null) return false;
 			bool isComboMax = (comboIndex == attackBehaviour.MaxCombo);
 
-			return value && !isComboMax;
-		}
-
-		public void ResetCombo()
-		{
-			comboIndex = 0;
-			animator.SetInteger(Constants.ANIM_PARAM_COMBO, comboIndex);
-			isComboQueued = false;
+			return !isComboMax;
 		}
 
 		public void NextCombo()
 		{
 			comboIndex++;
+		}
+
+		/** Animation Events**/
+		public void OnAttackHit()
+		{
+			if (!IsOwner) return;
+
+			AttackServerRPC(currentDir);
+		}
+
+		public void OnComboWindowOpen()
+		{
+			isEnableToCombo = true;
+		}
+
+		public void OnAttackEnd()
+		{
+			if (!IsOwner) return;
+
+			comboIndex = 0;
+			animator.SetInteger(Constants.ANIM_PARAM_COMBO, comboIndex);
+			stateMachine.ChangeState(stateMachine.Idle);
 		}
 	}
 }

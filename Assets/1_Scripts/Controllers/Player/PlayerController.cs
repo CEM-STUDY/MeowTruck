@@ -148,5 +148,6 @@ namespace MeowTruck.Controllers
 
 		public void SetAnimatorParam(AnimParamType type) => animator.SetTrigger(animIds[(int)type]);
 		public void SetAnimatorParam(AnimParamType type, bool isOn) => animator.SetBool(animIds[(int)type], isOn);
+		public void SetAnimatorParam(string name, int value) => animator.SetInteger(name, value);
 	}
 }

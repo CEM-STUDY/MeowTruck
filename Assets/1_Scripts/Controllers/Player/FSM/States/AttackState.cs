@@ -14,7 +14,6 @@ namespace MeowTruck.Controllers
 		public override void Enter()
 		{
 			base.Enter();
-			// controller.SetAnimatorParam(AnimParamType.Attack, true);
 
 			elapsedTime = 0f;
 			isCharged = false;
@@ -24,6 +23,7 @@ namespace MeowTruck.Controllers
 		{
 			base.Exit();
 
+			controller.SetAnimatorParam("WeaponIndex", -1);
 			controller.SetAnimatorParam(AnimParamType.Attack, false);
 		}
 

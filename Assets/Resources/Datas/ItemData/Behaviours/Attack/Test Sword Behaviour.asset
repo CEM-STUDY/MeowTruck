@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Test Sword Behaviour
   m_EditorClassIdentifier: Assembly-CSharp::MeowTruck.Data.SwordBehaviour
   maxCombo: 4
+  animWeaponIndex: 0
   damage: 10
   distance: 1
   boxSize: {x: 1.2, y: 0.8}

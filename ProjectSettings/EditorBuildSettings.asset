@@ -27,5 +27,6 @@ EditorBuildSettings:
     path: Assets/0_Scenes/5_FieldScene.unity
     guid: 8ea07210204e5a64e9950c3eb36fc2a6
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 7cf219cfe1e05ee41b047e3c2112c118, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

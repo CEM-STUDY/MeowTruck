@@ -6,8 +6,10 @@ namespace MeowTruck.Data
 	public abstract class AttackBehaviour : ItemUseBehaviour
 	{
 		[SerializeField] private int maxCombo;
+		[SerializeField] private int animWeaponIndex;
 
 		public int MaxCombo => maxCombo;
+		public int WeaponIndex => animWeaponIndex;
 
 		public override bool Use(PlayerController controller, ItemData data)
 		{
@@ -15,6 +17,6 @@ namespace MeowTruck.Data
 			return true;
 		}
 
-		public abstract bool Attack(PlayerController controller, Vector2 dir, LayerMask targetLayer);
+		public abstract void Attack(PlayerController controller, Vector2 dir, LayerMask targetLayer);
 	}
 }

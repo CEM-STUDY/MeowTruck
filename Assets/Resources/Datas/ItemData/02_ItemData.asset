@@ -17,4 +17,4 @@ MonoBehaviour:
   isConsumable: 0
   maxStack: 99
   itemSprite: {fileID: 21300000, guid: d1482390af62d644cb180afa38adaf8e, type: 3}
-  useBehaviour: {fileID: 11400000, guid: f99628b24ddd03744891aaa67f6e7936, type: 2}
+  useBehaviour: {fileID: 11400000, guid: 118cfe2f94194674eaeb1754bcd7da1b, type: 2}
