@@ -1,16 +1,9 @@
-using UnityEngine;
+using MeowTruck.Data;
 
-public class IPlaceable : MonoBehaviour
+namespace MeowTruck.Items
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public interface IPlaceable
+	{
+		PlacementDefinition Placement { get; }
+	}
 }

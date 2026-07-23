@@ -27,10 +27,12 @@ namespace MeowTruck.Controllers
 			if (itemID == -1)
 			{
 				itemSprite.sprite = null;
+				itemSprite.color = Color.white;
 				return;
 			}
 
 			itemSprite.sprite = Managers.Resource.GetItemData(itemID).ItemSprite;
+			itemSprite.color = Color.white;
 		}
 
 		/** Animation Events**/

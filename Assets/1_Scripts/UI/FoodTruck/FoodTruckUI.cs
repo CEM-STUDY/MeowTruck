@@ -1,4 +1,5 @@
 using MeowTruck.Environments;
+using MeowTruck.Systems.Placement;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,17 @@ namespace MeowTruck.UI
         private void Awake()
         {
             Debug.Log("Ready for Food Truck");
+            EnsurePlacementSystem();
+        }
+
+        private void EnsurePlacementSystem()
+        {
+            if (FindFirstObjectByType<FoodTruckPlacementSystem>() != null)
+                return;
+
+            GameObject placementSystem = new("FoodTruck Placement System");
+            placementSystem.AddComponent<PlacementGrid>();
+            placementSystem.AddComponent<FoodTruckPlacementSystem>();
         }
 
         private void OnEnable()

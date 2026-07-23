@@ -7,11 +7,6 @@ using UnityEngine.UI;
 
 namespace MeowTruck.UI
 {
-    public interface IMenuHoverHandler
-    {
-        void RequestFavoriteMenuHover(int cityIndex, bool active);
-    }
-
     public class MapPanel : MonoBehaviour, IMenuHoverHandler
     {
         [SerializeField] private Button closeButton;
@@ -28,7 +23,6 @@ namespace MeowTruck.UI
         private string pendingSceneName;
         private bool isTravelMode;
 
-
         private void Awake()
         {
             AddEvents();
@@ -43,6 +37,7 @@ namespace MeowTruck.UI
             confirmPopup.gameObject.SetActive(false);
         }
 
+        #region interface implement
         public void RequestFavoriteMenuHover(int cityIndex, bool active)
         {
             if (networkSync == null)
@@ -50,6 +45,9 @@ namespace MeowTruck.UI
 
             networkSync.RequestFavoriteMenuHover(cityIndex, active);
         }
+
+        public bool GetTravelMode() => isTravelMode;
+        #endregion
 
         private void OnMenuHoverChanged(int cityIndex, bool active)
         {
@@ -100,7 +98,6 @@ namespace MeowTruck.UI
 
             gameObject.SetActive(false);
         }
-
 
         private void OnDestroy()
         {
@@ -188,11 +185,15 @@ namespace MeowTruck.UI
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            if (!hoverHandler.GetTravelMode()) return;
+
             hoverHandler?.RequestFavoriteMenuHover(cityIndex, true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
+            if (!hoverHandler.GetTravelMode()) return;
+
             hoverHandler?.RequestFavoriteMenuHover(cityIndex, false);
         }
 

@@ -13,6 +13,8 @@ namespace MeowTruck.Controllers
 	/// </summary>
 	public partial class PlayerController : NetworkBehaviour
     {
+		public static PlayerController LocalPlayer { get; private set; }
+
 		[Header("Movement Params")]
 		[SerializeField] private float moveSpeed;
 		[SerializeField] private float dashSpeed;
@@ -44,6 +46,7 @@ namespace MeowTruck.Controllers
 		private Vector2 prevDir = Vector2.right;
 
 		private NetworkVariable<int> selectedItemId = new(-1, writePerm: NetworkVariableWritePermission.Owner);
+		public int SelectedItemId => selectedItemId.Value;
 
 		private void Awake()
 		{
@@ -72,12 +75,23 @@ namespace MeowTruck.Controllers
 		public override void OnNetworkSpawn()
 		{
 			base.OnNetworkSpawn();
+
+			if (IsOwner)
+				LocalPlayer = this;
 			
 			selectedItemId.OnValueChanged += ((_, itemId) =>
 			{
 				OnItemSelected(itemId);
 			});
 			OnItemSelected(selectedItemId.Value);
+		}
+
+		public override void OnNetworkDespawn()
+		{
+			if (LocalPlayer == this)
+				LocalPlayer = null;
+
+			base.OnNetworkDespawn();
 		}
 
 		private void Update()
@@ -110,6 +124,13 @@ namespace MeowTruck.Controllers
 		{
 			rigidBody.linearVelocity = dir * moveSpeed;
 		}
+
+		public void SetHeldItemTint(Color color)
+		{
+			if (itemSprite == null) return;
+			itemSprite.color = color;
+		}
+
 		public async UniTask Dash(Vector2 dir)
 		{
 			if (isDashing) return;
