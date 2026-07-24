@@ -1,14 +1,15 @@
-using MeowTruck.Manager;
+using System;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MeowTruck.Environments
 {
 	public class MeetingPoint : NetworkBehaviour
 	{
-		[SerializeField] private Vector2 boxCenter;
-		[SerializeField] private Vector2 boxSize;
+		[SerializeField] private NetworkVariable<Vector2> boxCenter = new(Vector2.zero);
+		[SerializeField] private NetworkVariable<Vector2> boxSize = new(Vector2.zero);
 		[SerializeField] private float maxTime = 5f;
 
 		[Header("Progress Bar")]
@@ -19,9 +20,12 @@ namespace MeowTruck.Environments
 		[SerializeField, ReadOnly]
 		private bool isMeeting = false;
 
+		public Action<MeetingPoint> OnMeetingCompletedAction { get; set; } = null;
 
 		private Collider2D[] hits = new Collider2D[Constants.MAX_PLAYERS];
 		private ContactFilter2D filter = new ContactFilter2D();
+
+		private bool isOnce = false;
 
 		private void Awake()
 		{
@@ -37,6 +41,19 @@ namespace MeowTruck.Environments
 		public override void OnNetworkDespawn()
 		{
 			base.OnNetworkDespawn();
+		}
+
+		// Host-Only
+		public void SetMeetingPoint(Vector2 size, bool isOnce)
+		{
+			if (!IsHost)
+			{
+				Debug.LogWarning("[MeetingPoint] - it is Host-Only!");
+				return;
+			}
+
+			this.isOnce = isOnce;
+			boxSize.Value = size;
 		}
 
 		[ClientRpc]
@@ -60,8 +77,8 @@ namespace MeowTruck.Environments
 		private void Update()
 		{
 			meetingProgress.size = new Vector2(Mathf.Clamp01(elapsedTime.Value / maxTime), 1f);
-			playerCount = Physics2D.OverlapBox(transform.position.ToVec2() + boxCenter, boxSize * 0.5f, 0f, filter, hits);
-			
+			playerCount = Physics2D.OverlapBox(transform.position.ToVec2() + boxCenter.Value, boxSize.Value * 0.5f, 0f, filter, hits);
+
 			isLocalPlayerDetected = false;
 			for (int i = 0; i < playerCount; i++)
 			{
@@ -81,8 +98,8 @@ namespace MeowTruck.Environments
 				elapsedTime.Value += Time.deltaTime;
 				if (elapsedTime.Value > maxTime)
 				{
-					// TODO - 게이지 다 차면 할 일 작성
-					Managers.Scene.ChangeScene(Constants.SCENE_VILLAGE);
+					OnMeetingCompletedAction?.Invoke(this);
+					if(isOnce) OnMeetingCompletedAction = null;
 				}
 			}
 			else
@@ -94,10 +111,10 @@ namespace MeowTruck.Environments
 		private void OnDrawGizmos()
 		{
 			Gizmos.color = Color.green;
-			Gizmos.matrix = Matrix4x4.TRS(transform.position.ToVec2() + boxCenter, Quaternion.identity, Vector3.one);
-			Gizmos.DrawWireCube(Vector3.zero, boxSize);
+			Gizmos.matrix = Matrix4x4.TRS(transform.position.ToVec2() + boxCenter.Value, Quaternion.identity, Vector3.one);
+			Gizmos.DrawWireCube(Vector3.zero, boxSize.Value);
 			Gizmos.color = new Color(0f, 1f, 0f, 0.1f);
-			Gizmos.DrawCube(Vector3.zero, boxSize);
+			Gizmos.DrawCube(Vector3.zero, boxSize.Value);
 		}
 	}
 }

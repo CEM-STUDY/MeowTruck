@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System;
 using Unity.Netcode;
 
 namespace MeowTruck.Manager
@@ -25,5 +27,48 @@ namespace MeowTruck.Manager
 			}
 		}
 
+		/// <summary>
+		/// Synchronize clients event
+		/// 
+		/// ex) Wait until all clients' cameras finish moving, then trigger the next event.
+		/// </summary>
+
+		private int currentEventId = 0;
+		private Action onAllFinishedEvent = null;
+		private HashSet<ulong> finishedClients = new();
+
+		public Action<GameEventType, int> OnGameEvent { get; set; }
+
+		public void StartEventSync(Action finishEvent, GameEventType evtType)
+		{
+			if (!NetworkManager.IsHost) return;
+
+			onAllFinishedEvent = finishEvent;
+			finishedClients.Clear();
+
+			StartEventSyncClientRPC(evtType, ++currentEventId);
+			OnGameEvent?.Invoke(evtType, currentEventId);   // OnHost
+		}
+
+		[Rpc(SendTo.NotServer, InvokePermission = RpcInvokePermission.Server)]
+		public void StartEventSyncClientRPC(GameEventType evtType, int eventId)
+		{
+			currentEventId = eventId;
+			OnGameEvent?.Invoke(evtType, eventId);  // OnClient
+		}
+
+		[Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+		public void ReportEventFinishServerRPC(int eventId, ulong clientId)
+		{
+			if (currentEventId != eventId) return;
+
+			if (finishedClients.Add(clientId))
+			{
+				if (finishedClients.Count == NetworkManager.ConnectedClientsList.Count)
+				{
+					onAllFinishedEvent?.Invoke();
+				}
+			}
+		}
 	}
 }

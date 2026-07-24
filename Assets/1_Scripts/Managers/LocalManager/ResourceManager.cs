@@ -1,5 +1,6 @@
 using MeowTruck.Data;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace MeowTruck.Manager
@@ -33,6 +34,16 @@ namespace MeowTruck.Manager
 		{
 			if (!entityDataDictionary.TryGetValue(entityId, out var entityData)) return null;
 			return entityData;
+		}
+
+		public T Load<T>(string path) where T : Object
+		{
+			return Resources.Load<T>(path);
+		}
+
+		public T[] LoadAll<T>(string path) where T : Object
+		{
+			return Resources.LoadAll<T>(path);
 		}
 	}
 }

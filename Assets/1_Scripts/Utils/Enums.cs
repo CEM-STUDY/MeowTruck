@@ -11,4 +11,10 @@ namespace MeowTruck
 		Resource,
 		Structure,
 	}
+
+	public enum GameEventType
+	{
+		Camera_ToBoss,
+		Camera_ToPlayer,
+	}
 }

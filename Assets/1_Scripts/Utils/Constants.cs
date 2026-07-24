@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MeowTruck
 {
-	public static class Constants
+	public static partial class Constants
 	{
 		/** Network Params **/
 		public static readonly int MAX_PLAYERS = 4;

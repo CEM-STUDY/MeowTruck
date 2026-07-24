@@ -20,6 +20,11 @@ namespace MeowTruck.Manager
 			}
 		}
 
+		[ContextMenu("ToVillage")]
+		public void ToVillage()
+		{
+			Managers.Scene.ChangeScene(Constants.SCENE_VILLAGE);	
+		}
 
 		public void Quit()
 		{

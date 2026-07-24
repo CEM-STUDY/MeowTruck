@@ -146,6 +146,11 @@ namespace MeowTruck.Controllers
 			currentDir = (worldPos - transform.position).ToVec2().normalized;
 		}
 
+		public void SetPosition(Vector3 pos)
+		{
+			rigidBody.MovePosition(pos);
+		}
+
 		public void SetAnimatorParam(AnimParamType type) => animator.SetTrigger(animIds[(int)type]);
 		public void SetAnimatorParam(AnimParamType type, bool isOn) => animator.SetBool(animIds[(int)type], isOn);
 		public void SetAnimatorParam(string name, int value) => animator.SetInteger(name, value);
